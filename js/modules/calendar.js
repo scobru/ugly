@@ -2,74 +2,142 @@
 document.getElementById("calendar-tab").innerHTML = `
   <section>
     <h2>Ugly Calendar</h2>
-    <p>Salva un evento relativo a una data.</p>
-    <input type="date" id="uglyDate" />
-    <input type="text" id="uglyDateEvent" placeholder="Descrizione evento..." />
-    <button id="uglyDateBtn">Salva evento</button>
-    <div id="uglyEvents"></div>
+    <div style="margin: 10px 0;">
+      <input type="text" id="eventTitle" placeholder="Titolo evento">
+      <input type="datetime-local" id="eventDate">
+      <button onclick="addEvent()">➕ Aggiungi</button>
+    </div>
+    <div id="eventsList" style="margin-top: 20px;"></div>
   </section>
 `;
 
-// Riferimenti DOM
-const dateInput = document.getElementById("uglyDate");
-const eventInput = document.getElementById("uglyDateEvent");
-const dateBtn = document.getElementById("uglyDateBtn");
-const eventsDiv = document.getElementById("uglyEvents");
-
+// Funzione per caricare gli eventi
 function loadUglyCalendar() {
-  eventsDiv.innerHTML = "";
-  user.get("uglyCalendar").once(function (data) {
-    if (!data) return;
-    Object.keys(data).forEach(function (dt) {
-      if (dt === "_") return;
-      addCalendarEvent(dt, data[dt]);
-    });
-  });
-
-  user.get("uglyCalendar").map().on(function (eventDesc, dt) {
-    if (dt === "_") return;
-    if (!eventDesc) {
-      const oldP = document.getElementById("cal-" + dt);
-      if (oldP) oldP.remove();
-      return;
-    }
-    addCalendarEvent(dt, eventDesc);
-  });
-}
-
-function addCalendarEvent(dt, description) {
-  let oldP = document.getElementById("cal-" + dt);
-  if (oldP) {
-    oldP.innerHTML = "";
-  } else {
-    oldP = document.createElement("p");
-    oldP.id = "cal-" + dt;
-  }
-
-  const textSpan = document.createElement("span");
-  textSpan.textContent = dt + ": " + description;
-
-  const deleteBtn = createDeleteButton();
-  deleteBtn.addEventListener("click", function () {
-    user.get("uglyCalendar").get(dt).put(null);
-    oldP.remove();
-    uglySounds.play("delete");
-  });
-
-  oldP.appendChild(textSpan);
-  oldP.appendChild(deleteBtn);
+  if (!user.is) return;
   
-  if (!document.getElementById("cal-" + dt)) {
-    eventsDiv.appendChild(oldP);
+  const eventsList = document.getElementById("eventsList");
+  eventsList.innerHTML = '';
+
+  // Usa un nodo specifico per gli eventi dell'utente
+  const eventsNode = `${user.is.pub}/events`;
+  gun.get(eventsNode).map().once((event, id) => {
+    if (event) {
+      addEventToUI(event, id);
+    }
+  });
+}
+
+// Funzione per aggiungere un evento
+async function addEvent() {
+  if (!user.is) {
+    alert('Devi essere autenticato per aggiungere eventi');
+    return;
+  }
+
+  const titleInput = document.getElementById('eventTitle');
+  const dateInput = document.getElementById('eventDate');
+  
+  const title = titleInput.value.trim();
+  const date = dateInput.value;
+
+  if (!title || !date) {
+    alert('Inserisci sia il titolo che la data dell\'evento');
+    return;
+  }
+
+  const event = {
+    title: title,
+    date: date,
+    ts: Date.now()
+  };
+
+  // Usa un nodo specifico per gli eventi dell'utente
+  const eventsNode = `${user.is.pub}/events`;
+  gun.get(eventsNode).set(event, (ack) => {
+    if (ack.err) {
+      console.error('Errore salvataggio evento:', ack.err);
+      alert('Errore nel salvataggio dell\'evento');
+    } else {
+      titleInput.value = '';
+      dateInput.value = '';
+      addAmbientSound({ type: 'success' });
+    }
+  });
+}
+
+// Funzione per eliminare un evento
+function deleteEvent(id) {
+  if (confirm('Vuoi davvero eliminare questo evento?')) {
+    const eventsNode = `${user.is.pub}/events`;
+    gun.get(eventsNode).get(id).put(null);
+    document.getElementById(`event-${id}`)?.remove();
+    addAmbientSound({ type: 'delete' });
   }
 }
 
-dateBtn.addEventListener("click", function () {
-  const d = dateInput.value;
-  const e = eventInput.value.trim();
-  if (!d || !e) return;
-  user.get("uglyCalendar").get(d).put(e);
-  dateInput.value = "";
-  eventInput.value = "";
-  addAmbientSound({ type: "calendar", date: d, event: e });
-}); 
+// Funzione per aggiungere un evento alla UI
+function addEventToUI(event, id) {
+  const eventsList = document.getElementById("eventsList");
+  
+  const eventDiv = document.createElement('div');
+  eventDiv.id = `event-${id}`;
+  eventDiv.style.border = '2px solid black';
+  eventDiv.style.padding = '10px';
+  eventDiv.style.margin = '5px 0';
+  eventDiv.style.backgroundColor = 'white';
+  eventDiv.style.display = 'flex';
+  eventDiv.style.justifyContent = 'space-between';
+  eventDiv.style.alignItems = 'center';
+
+  // Calcola se l'evento è passato
+  const eventDate = new Date(event.date);
+  const isPast = eventDate < new Date();
+  
+  // Formatta la data in modo leggibile
+  const formattedDate = eventDate.toLocaleString('it-IT', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+
+  eventDiv.innerHTML = `
+    <div>
+      <strong style="${isPast ? 'text-decoration: line-through;' : ''}">${event.title}</strong>
+      <br>
+      <span style="color: ${isPast ? 'gray' : 'black'}">📅 ${formattedDate}</span>
+      <br>
+      <small>Aggiunto il: ${new Date(event.ts).toLocaleString()}</small>
+    </div>
+    <div>
+      <button onclick="deleteEvent('${id}')" 
+              style="background: var(--ugly-pink);">
+        🗑️
+      </button>
+    </div>
+  `;
+
+  // Ordina gli eventi per data
+  let inserted = false;
+  for (const child of eventsList.children) {
+    const childDate = new Date(child.querySelector('span').textContent.slice(2));
+    if (eventDate < childDate) {
+      eventsList.insertBefore(eventDiv, child);
+      inserted = true;
+      break;
+    }
+  }
+  if (!inserted) {
+    eventsList.appendChild(eventDiv);
+  }
+}
+
+// Rendi le funzioni disponibili globalmente
+window.addEvent = addEvent;
+window.deleteEvent = deleteEvent;
+window.loadUglyCalendar = loadUglyCalendar;
+
+// Inizializza il modulo
+loadUglyCalendar(); 

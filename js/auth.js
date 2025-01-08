@@ -7,10 +7,17 @@ const userStatus = document.getElementById("userStatus");
 const appDiv = document.getElementById("app");
 const accountSection = document.querySelector("section:first-of-type"); // Sezione account
 
+// Aggiungi una variabile per tracciare lo stato dell'autenticazione
+let isAuthenticating = false;
+
+// Stile dello status utente
+if (userStatus) {
+  userStatus.style.marginRight = "10px";
+}
+
 // Crea il pulsante logout
 const logoutBtn = document.createElement("button");
 logoutBtn.textContent = "🚪 Logout";
-logoutBtn.style.margin = "10px";
 logoutBtn.style.padding = "5px 15px";
 logoutBtn.style.cursor = "pointer";
 logoutBtn.style.backgroundColor = "var(--ugly-pink)";
@@ -18,37 +25,34 @@ logoutBtn.style.border = "2px solid black";
 logoutBtn.style.borderRadius = "5px";
 logoutBtn.style.display = "none";
 
-// Aggiungi l'event listener direttamente
+// Aggiungi l'event listener per il logout
 logoutBtn.addEventListener("click", logout);
 
-// Crea un div per il logout e lo status
+// Crea il container per logout e status
 const logoutContainer = document.createElement("div");
-logoutContainer.style.textAlign = "right";
-logoutContainer.style.padding = "10px";
 logoutContainer.style.display = "none";
-logoutContainer.style.position = "fixed";
-logoutContainer.style.top = "10px";
-logoutContainer.style.right = "10px";
-logoutContainer.style.zIndex = "1000";
-logoutContainer.appendChild(logoutBtn);
+logoutContainer.style.alignItems = "center";
+logoutContainer.style.gap = "10px";
+
+// Assembla il container
 logoutContainer.appendChild(userStatus);
+logoutContainer.appendChild(logoutBtn);
 
-// Inserisci il container nel documento
-document.body.appendChild(logoutContainer);
-
-// Aggiungi una variabile per tracciare lo stato dell'autenticazione
-let isAuthenticating = false;
+// Inserisci nel container auth
+const authContainer = document.getElementById("auth-container");
+if (authContainer) {
+  authContainer.appendChild(logoutContainer);
+}
 
 function updateUIForLoggedUser(username) {
   // Nascondi la sezione account
   accountSection.style.display = "none";
   
   // Mostra il container del logout
-  logoutContainer.style.display = "block";
+  logoutContainer.style.display = "flex";
   
   // Aggiorna lo status e mostra l'app
   userStatus.textContent = "Loggato come: " + username;
-  userStatus.style.marginLeft = "10px";
   appDiv.classList.remove("hidden");
   
   // Mostra il pulsante logout
@@ -169,13 +173,15 @@ function loadAllData() {
   try {
     loadUglyText();
     loadUglyNotes();
+    loadUglyTodo();
+    loadUglyPasswords();
     loadUglyCalendar();
     loadUglyReminders();
     loadUglyContacts();
     loadUglyFiles();
-    loadUglyVoice();
     loadUglyChat();
     loadUglyMail();
+    // loadUglyVoice();    // Gestito separatamente
     console.log("Dati caricati con successo");
   } catch (e) {
     console.error("Errore nel caricamento dei dati:", e);

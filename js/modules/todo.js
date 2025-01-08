@@ -1,88 +1,127 @@
 // Aggiungi il contenuto HTML
 document.getElementById("todo-tab").innerHTML = `
   <section>
-    <h2>Ugly ToDo</h2>
-    <input type="text" id="uglyTodoInput" placeholder="Cosa devi fare?" />
-    <button id="uglyTodoButton">Aggiungi Task</button>
-    <div id="uglyToDoList"></div>
+    <h2>Ugly Todo</h2>
+    <div style="margin: 10px 0;">
+      <input type="text" id="todoInput" placeholder="Cosa devi fare?">
+      <button onclick="addTodo()">➕ Aggiungi</button>
+    </div>
+    <div id="todoList" style="margin-top: 20px;"></div>
   </section>
 `;
 
-// Riferimenti DOM
-const todoInput = document.getElementById("uglyTodoInput");
-const todoButton = document.getElementById("uglyTodoButton");
-const todoListDiv = document.getElementById("uglyToDoList");
+// Funzione per caricare i todo
+function loadUglyTodo() {
+  if (!user.is) return;
+  
+  const todoList = document.getElementById("todoList");
+  todoList.innerHTML = '';
 
-function createOrUpdateTodo(data, id) {
-  let existing = document.getElementById("todo-" + id);
-  if (!existing) {
-    existing = document.createElement("div");
-    existing.id = "todo-" + id;
+  // Usa un nodo specifico per i todo dell'utente
+  const todoNode = `${user.is.pub}/todos`;
+  gun.get(todoNode).map().once((todo, id) => {
+    if (todo) {
+      addTodoToUI(todo, id);
+    }
+  });
+}
 
-    const checkbox = document.createElement("input");
-    checkbox.type = "checkbox";
-    checkbox.checked = !!data.done;
-    checkbox.addEventListener("change", function () {
-      user.get("uglyTodo").get(id).put({
-        text: data.text,
-        done: checkbox.checked,
-        timestamp: data.timestamp
-      });
-    });
-
-    const span = document.createElement("span");
-    span.textContent = data.text;
-    span.style.marginLeft = "10px";
-
-    const deleteBtn = createDeleteButton();
-    deleteBtn.addEventListener("click", function () {
-      if (confirm("Sei sicuro di voler eliminare questo task?")) {
-        user.get("uglyTodo").get(id).put(null);
-      }
-    });
-
-    existing.appendChild(checkbox);
-    existing.appendChild(span);
-    existing.appendChild(deleteBtn);
-    todoListDiv.appendChild(existing);
+// Funzione per aggiungere un todo
+async function addTodo() {
+  if (!user.is) {
+    alert('Devi essere autenticato per aggiungere todo');
+    return;
   }
 
-  const checkbox = existing.querySelector('input[type="checkbox"]');
-  const span = existing.querySelector("span");
-  checkbox.checked = !!data.done;
-  span.textContent = data.text;
+  const todoInput = document.getElementById('todoInput');
+  const text = todoInput.value.trim();
 
-  if (data.done) {
-    span.classList.add("todo-completed");
-  } else {
-    span.classList.remove("todo-completed");
+  if (!text) {
+    alert('Inserisci il testo del todo');
+    return;
+  }
+
+  const todo = {
+    text: text,
+    done: false,
+    ts: Date.now() // Abbreviato timestamp
+  };
+
+  // Usa un nodo specifico per i todo dell'utente
+  const todoNode = `${user.is.pub}/todos`;
+  gun.get(todoNode).set(todo, (ack) => {
+    if (ack.err) {
+      console.error('Errore salvataggio todo:', ack.err);
+      alert('Errore nel salvataggio del todo');
+    } else {
+      todoInput.value = '';
+      addAmbientSound({ type: 'success' });
+    }
+  });
+}
+
+// Funzione per completare/decompletare un todo
+function toggleTodo(id) {
+  const todoNode = `${user.is.pub}/todos`;
+  gun.get(todoNode).get(id).once((todo) => {
+    if (todo) {
+      todo.done = !todo.done;
+      gun.get(todoNode).get(id).put(todo);
+      addAmbientSound({ type: 'click' });
+    }
+  });
+}
+
+// Funzione per eliminare un todo
+function deleteTodo(id) {
+  if (confirm('Vuoi davvero eliminare questo todo?')) {
+    const todoNode = `${user.is.pub}/todos`;
+    gun.get(todoNode).get(id).put(null);
+    document.getElementById(`todo-${id}`)?.remove();
+    addAmbientSound({ type: 'delete' });
   }
 }
 
-todoButton.addEventListener("click", function () {
-  const task = todoInput.value.trim();
-  if (!task) return;
+// Funzione per aggiungere un todo alla UI
+function addTodoToUI(todo, id) {
+  const todoList = document.getElementById("todoList");
   
-  user.get("uglyTodo").set({
-    text: task,
-    done: false,
-    timestamp: Date.now()
-  });
-  todoInput.value = "";
-  addAmbientSound({ type: "todo", text: task });
-});
+  const todoDiv = document.createElement('div');
+  todoDiv.id = `todo-${id}`;
+  todoDiv.style.border = '2px solid black';
+  todoDiv.style.padding = '10px';
+  todoDiv.style.margin = '5px 0';
+  todoDiv.style.backgroundColor = todo.done ? 'var(--ugly-green)' : 'white';
+  todoDiv.style.display = 'flex';
+  todoDiv.style.justifyContent = 'space-between';
+  todoDiv.style.alignItems = 'center';
 
-// Caricamento dati
-user.get("uglyTodo").map().once(function (data, id) {
-  if (!data) return;
-  createOrUpdateTodo(data, id);
-});
+  todoDiv.innerHTML = `
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <input type="checkbox" ${todo.done ? 'checked' : ''} 
+             onclick="toggleTodo('${id}')" 
+             style="transform: scale(1.5);">
+      <span style="${todo.done ? 'text-decoration: line-through;' : ''}">
+        ${todo.text}
+      </span>
+    </div>
+    <div>
+      <small>${new Date(todo.ts).toLocaleString()}</small>
+      <button onclick="deleteTodo('${id}')" 
+              style="background: var(--ugly-pink); margin-left: 10px;">
+        🗑️
+      </button>
+    </div>
+  `;
 
-user.get("uglyTodo").map().on(function (data, id) {
-  if (!data) {
-    const existing = document.getElementById("todo-" + id);
-    if (existing) existing.remove();
-    return;
-  }
-  createOrUpdateTodo(data, id);
-}); 
+  todoList.appendChild(todoDiv);
+}
+
+// Rendi le funzioni disponibili globalmente
+window.addTodo = addTodo;
+window.toggleTodo = toggleTodo;
+window.deleteTodo = deleteTodo;
+window.loadUglyTodo = loadUglyTodo;
+
+// Inizializza il modulo
+loadUglyTodo(); 
