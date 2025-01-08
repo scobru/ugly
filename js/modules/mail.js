@@ -1,4 +1,18 @@
-// Aggiungi il contenuto HTML
+/****************************************
+ * Esempio di inizializzazione GUN e user
+ ****************************************/
+// Se non li hai già, puoi decommentare queste righe:
+// const gun = Gun();
+// const user = gun.user();
+
+// Esempio di funzione vuota se non hai suoni
+function addAmbientSound(params) {
+  console.log('Suono di ambiente:', params);
+}
+
+/***********************************************************
+ * Aggiunta dinamica dell'HTML per la sezione "Ugly Mail"
+ ***********************************************************/
 document.getElementById("mail-tab").innerHTML = `
   <section>
     <h2>Ugly Mail</h2>
@@ -18,47 +32,133 @@ document.getElementById("mail-tab").innerHTML = `
   </section>
 `;
 
-// Rendi globali le funzioni
+/***************************************************
+ *  Rendi globali le funzioni, se ti serve farlo
+ ***************************************************/
 window.sendMail = sendMail;
 window.clearMailbox = clearMailbox;
 
-// Funzione per inviare una mail
-async function sendMail() {
-  const to = document.getElementById('mailTo').value.trim();
-  const subject = document.getElementById('mailSubject').value.trim();
-  const content = document.getElementById('mailContent').value.trim();
+/***************************************************************
+ * Funzione per ottenere la chiave epub (chiave pubblica effimera)
+ * di un utente a partire dal suo alias
+ ***************************************************************/
+async function getLatestEpub(alias) {
+  return new Promise((resolve) => {
+    console.log('Cerco epub per:', alias);
+    
+    // Cerchiamo i dati dell'utente in base all'alias
+    gun.get(`~@${alias}`).once((data) => {
+      console.log('Dati utente trovati:', data);
+      
+      if (!data) {
+        console.warn('Nessun dato trovato per:', alias);
+        resolve(null);
+        return;
+      }
 
-  if (!to || !subject || !content || !user.is) {
-    alert('Compila tutti i campi!');
+      // Trova la chiave pubblica (pair) più recente, in modo semplificato
+      let pubKey = null;
+      for (let key in data) {
+        if (key.startsWith('~')) {
+          pubKey = key;
+          break;
+        }
+      }
+
+      if (!pubKey) {
+        console.warn('Nessuna chiave pubblica trovata per:', alias);
+        resolve(null);
+        return;
+      }
+
+      console.log('Chiave pubblica trovata:', pubKey);
+
+      // Una volta trovata la "root" (~pubKey), otteniamo i dettagli: epub, ecc.
+      gun.get(pubKey).once((userData) => {
+        console.log('Dati utente completi:', userData);
+        
+        if (!userData || !userData.epub) {
+          console.warn('Epub non trovato per:', alias);
+          resolve(null);
+          return;
+        }
+
+        console.log('Epub trovato:', userData.epub);
+        resolve(userData.epub);
+      });
+    });
+  });
+}
+
+/*********************************************************
+ * Funzione per inviare una mail cifrata con ECDH (epub)
+ *********************************************************/
+async function sendMail() {
+  const mailTo = document.getElementById('mailTo');
+  const mailSubject = document.getElementById('mailSubject');
+  const mailContent = document.getElementById('mailContent');
+
+  // Verifica che tutti gli elementi HTML esistano
+  if (!mailTo || !mailSubject || !mailContent) {
+    console.error('Elementi form mail non trovati');
+    return;
+  }
+
+  const to = mailTo.value.trim();
+  const subject = mailSubject.value.trim();
+  const content = mailContent.value.trim();
+
+  // Log dei valori per debug
+  console.log('Valori form:', {
+    to,
+    subject,
+    content,
+    userIs: user.is
+  });
+
+  // Validazione
+  const validationErrors = [];
+  if (!user.is) {
+    validationErrors.push('Devi essere autenticato per inviare mail');
+  }
+  if (!to) {
+    validationErrors.push('Inserisci il destinatario');
+  }
+  if (!subject) {
+    validationErrors.push('Inserisci l\'oggetto');
+  }
+  if (!content) {
+    validationErrors.push('Inserisci il contenuto');
+  }
+
+  if (validationErrors.length > 0) {
+    alert('Errori:\n' + validationErrors.join('\n'));
     return;
   }
 
   try {
-    // Cerca la chiave pubblica del destinatario
-    let to_pub = await new Promise((resolve) => {
-      gun.get(`~@${to}`).once((data) => {
-        if (!data) {
-          resolve(null);
-          return;
-        }
-        for (let key in data) {
-          if (key.startsWith('~')) {
-            resolve(key.slice(1));
-            return;
-          }
-        }
-        resolve(null);
-      });
-    });
+    console.log('Inizio processo invio mail a:', to);
+    console.log('Mittente (alias):', user.is.alias);
+    console.log('Chiave epub mittente:', user.is.epub);
+    
+    // Disabilita il pulsante durante l'invio
+    const sendButton = document.querySelector('button[onclick="sendMail()"]');
+    if (sendButton) {
+      sendButton.disabled = true;
+      sendButton.textContent = '📨 Invio in corso...';
+    }
 
-    if (!to_pub) {
-      alert('Destinatario non trovato!');
+    // 1. Cerca la chiave epub del destinatario
+    const to_epub = await getLatestEpub(to);
+    console.log('Risultato ricerca epub destinatario:', to_epub);
+    
+    if (!to_epub) {
+      alert('Destinatario non trovato o chiave epub non disponibile');
       return;
     }
 
+    // 2. Prepara i dati della mail
     const timestamp = Date.now();
-    
-    // Crea il messaggio
     const mailData = {
       from: user.is.alias,
       to: to,
@@ -67,136 +167,261 @@ async function sendMail() {
       timestamp: timestamp
     };
 
-    // Cripta il messaggio con la chiave condivisa
-    const secret = await SEA.secret(to_pub, user._.sea);
-    const encryptedMail = await SEA.encrypt(JSON.stringify(mailData), secret);
-
-    // Salva nella mailbox pubblica
-    gun.get('mails').set({
-      to: to,
-      from: user.is.alias,
-      data: encryptedMail,
-      timestamp: timestamp
+    // 3. Cripta usando la chiave ephemeral (ECDH)
+    console.log('ECDH + AES: secret con:', {
+      'destinatario_epub': to_epub,
+      'mie_chiavi': user._.sea
     });
 
-    // Salva nelle mail inviate (non criptato)
-    user.get('sent_mails').set(mailData);
+    const secret = await SEA.secret(to_epub, user._.sea);
+    console.log('Secret generato:', !!secret);
 
-    // Pulisci form
-    document.getElementById('mailTo').value = '';
-    document.getElementById('mailSubject').value = '';
-    document.getElementById('mailContent').value = '';
+    const encryptedContent = await SEA.encrypt(JSON.stringify(mailData), secret);
+    console.log('Contenuto crittato:', !!encryptedContent);
+
+    // 4. Salva nella mailbox pubblica: "mails"
+    const mailPackage = {
+      to: to,
+      from: user.is.alias,
+      data: encryptedContent,
+      timestamp: timestamp,
+      epub: user.is.epub // Necessario per far decrittare al destinatario
+    };
+
+    console.log('Salvataggio mail pubblica...');
+    await new Promise((resolve) => {
+      gun.get('mails').set(mailPackage, ack => {
+        console.log('Risposta salvataggio:', ack);
+        resolve(ack);
+      });
+    });
+
+    // 5. Salva una copia in "sent_mails" (non criptata, a discrezione)
+    console.log('Salvataggio copia inviata...');
+    await new Promise((resolve) => {
+      user.get('sent_mails').set(mailData, ack => {
+        console.log('Risposta salvataggio inviata:', ack);
+        resolve(ack);
+      });
+    });
+
+    // 6. Pulisci form e notifica
+    mailTo.value = '';
+    mailSubject.value = '';
+    mailContent.value = '';
 
     addAmbientSound({ type: 'success' });
     alert('Mail inviata con successo!');
+    
+    console.log('Processo invio completato');
   } catch (e) {
-    console.error('Errore invio mail:', e);
-    alert('Errore nell\'invio della mail');
+    console.error('Errore dettagliato invio mail:', e);
+    alert('Errore nell\'invio della mail: ' + e.message);
+  } finally {
+    // Riabilita il pulsante
+    const sendButton = document.querySelector('button[onclick="sendMail()"]');
+    if (sendButton) {
+      sendButton.disabled = false;
+      sendButton.textContent = '📧 Invia';
+    }
   }
 }
 
-// Funzione per caricare le mail
-async function loadUglyMail() {
-  const mailBox = document.getElementById('mailsList');
-  if (!mailBox) return;
-  
-  mailBox.innerHTML = '';
-  const processedMails = new Set();
+/***************************************************************
+ * Validazione del form in tempo reale (disabilita bottone se vuoto)
+ ***************************************************************/
+document.addEventListener('DOMContentLoaded', () => {
+  const mailTo = document.getElementById('mailTo');
+  const mailSubject = document.getElementById('mailSubject');
+  const mailContent = document.getElementById('mailContent');
+  const sendButton = document.querySelector('button[onclick="sendMail()"]');
 
-  // Carica le mail ricevute
-  gun.get('mails').map().on(async function(mail, id) {
-    if (!mail || processedMails.has(id) || mail.to !== user.is.alias) return;
+  function validateForm() {
+    const isValid = mailTo.value.trim() && 
+                    mailSubject.value.trim() && 
+                    mailContent.value.trim() && 
+                    user.is; // deve esserci un utente loggato
     
-    try {
-      processedMails.add(id);
-      
-      // Trova la chiave pubblica del mittente
-      const from_pub = await new Promise(resolve => {
-        gun.get(`~@${mail.from}`).once((data) => {
-          if (!data) {
-            resolve(null);
-            return;
-          }
-          for (let key in data) {
-            if (key.startsWith('~')) {
-              resolve(key.slice(1));
-              return;
-            }
-          }
-          resolve(null);
-        });
-      });
+    if (sendButton) {
+      sendButton.disabled = !isValid;
+    }
+  }
 
-      if (!from_pub) {
-        console.error('Mittente non trovato:', mail.from);
-        return;
-      }
-
-      // Decripta usando la chiave condivisa
-      const secret = await SEA.secret(from_pub, user._.sea);
-      let decryptedData;
-      try {
-        decryptedData = await SEA.decrypt(mail.data, secret);
-      } catch (decryptError) {
-        console.warn('Errore prima decrittazione, riprovo...', decryptError);
-        // Riprova con una chiave diversa
-        const altSecret = await SEA.secret(user._.sea.pub, from_pub);
-        decryptedData = await SEA.decrypt(mail.data, altSecret);
-      }
-      
-      if (!decryptedData) {
-        console.error('Mail non decrittabile:', id);
-        return;
-      }
-
-      let mailData;
-      try {
-        mailData = JSON.parse(decryptedData);
-      } catch (parseError) {
-        console.error('Errore parsing mail:', parseError);
-        return;
-      }
-
-      mailData.id = id;
-      mailData.type = 'received';
-      
-      addMailToBox(mailData);
-    } catch (e) {
-      console.error('Errore processamento mail:', e);
+  // Ascolta gli eventi di input
+  [mailTo, mailSubject, mailContent].forEach(element => {
+    if (element) {
+      element.addEventListener('input', validateForm);
     }
   });
 
-  // Carica le mail inviate
-  user.get('sent_mails').map().on(function(mail, id) {
-    if (!mail || processedMails.has(id)) return;
-    
-    try {
+  // Validazione iniziale
+  validateForm();
+});
+
+/**************************************************************
+ * Funzione di inizializzazione per caricare le mail all'avvio
+ **************************************************************/
+let mailInitialized = false;
+let currentUser = null;
+let processedMails = new Set();
+
+async function loadUglyMail() {
+  if (!user.is) {
+    console.log('Utente non autenticato, non carico le mail');
+    return;
+  }
+
+  // Se l'utente è cambiato, resetta tutto
+  if (currentUser !== user.is.alias) {
+    console.log('Cambio utente rilevato, resetto stato...');
+    currentUser = user.is.alias;
+    processedMails = new Set();
+    mailInitialized = false;
+  }
+
+  if (mailInitialized) {
+    console.log('Mail già inizializzate per:', currentUser);
+    return;
+  }
+
+  console.log('Inizializzazione mail per:', user.is.alias);
+  mailInitialized = true;
+
+  const mailBox = document.getElementById('mailsList');
+  if (!mailBox) {
+    console.error('Elemento mailsList non trovato');
+    return;
+  }
+  
+  mailBox.innerHTML = '';
+
+  try {
+    // Carica le mail ricevute
+    gun.get('mails').map().on(async function(mail, id) {
+      if (!mail) {
+        console.log('Mail nulla:', id);
+        return;
+      }
+
+      if (processedMails.has(id)) {
+        console.log('Mail già processata:', id);
+        return;
+      }
+
+      if (mail.to !== user.is.alias) {
+        console.log('Mail non per questo utente:', mail.to);
+        return;
+      }
+      
+      console.log('Processamento nuova mail:', id, mail);
+      processedMails.add(id);
+
+      try {
+        // Se manca l'epub, proviamo a recuperarla
+        if (!mail.epub) {
+          console.warn('Mail senza epub, provo a recuperarlo dal mittente...');
+          mail.epub = await getLatestEpub(mail.from);
+          if (!mail.epub) {
+            console.error('Impossibile recuperare epub del mittente:', mail.from);
+            return;
+          }
+        }
+
+        // ECDH: decritta usando la tua chiave privata e l'epub del mittente
+        console.log('Tentativo decrittazione con:', {
+          epub_mittente: mail.epub,
+          mie_chiavi: user._.sea
+        });
+
+        const secret = await SEA.secret(mail.epub, user._.sea);
+        console.log('Secret generato:', !!secret);
+        
+        const decryptedData = await SEA.decrypt(mail.data, secret);
+        console.log('Risultato decrittazione:', !!decryptedData);
+        
+        if (!decryptedData) {
+          console.error('Mail non decrittabile:', id);
+          return;
+        }
+
+        let mailData = JSON.parse(decryptedData);
+        console.log('Mail decrittata con successo:', mailData);
+        
+        mailData.id = id;
+        mailData.type = 'received';
+        
+        addMailToBox(mailData);
+
+      } catch (e) {
+        console.error('Errore processamento mail ricevuta:', id, e);
+      }
+    });
+
+    // Carica le mail inviate
+    console.log('Caricamento mail inviate...');
+    user.get('sent_mails').map().on(function(mail, id) {
+      if (!mail || processedMails.has(id)) return;
+      
+      console.log('Processamento mail inviata:', id, mail);
       processedMails.add(id);
       mail.id = id;
       mail.type = 'sent';
       addMailToBox(mail);
-    } catch (e) {
-      console.error('Errore processamento mail inviata:', e);
-    }
-  });
+    });
+  } catch (e) {
+    console.error('Errore generale caricamento mail:', e);
+    mailInitialized = false;
+  }
 }
 
-// Inizializza il modulo
-loadUglyMail();
+/************************************************************
+ * Ascolta gli eventi di autenticazione su GUN e carica le mail
+ ************************************************************/
+gun.on('auth', () => {
+  console.log('Evento gun.on("auth"): utente:', user.is?.alias);
+  if (user.is) {
+    setTimeout(loadUglyMail, 500);
+  }
+});
 
-// Funzione per visualizzare una mail
+user.on('auth', () => {
+  console.log('Evento user.on("auth"): utente:', user.is?.alias);
+  if (user.is) {
+    setTimeout(loadUglyMail, 500);
+  }
+});
+
+/*********************************************
+ * Aggiunge la mail alla UI (lista mailsList)
+ *********************************************/
 function addMailToBox(mail) {
-  const mailBox = document.getElementById('mailsList');
-  const existingMail = document.getElementById(`mail-${mail.id}`);
+  console.log('Tentativo di aggiungere mail alla UI:', mail);
   
-  if (existingMail) return;
+  const mailBox = document.getElementById('mailsList');
+  if (!mailBox) {
+    console.error('mailsList non trovato');
+    return;
+  }
+
+  // Evita duplicati
+  const existingMail = document.getElementById(`mail-${mail.id}`);
+  if (existingMail) {
+    console.log('Mail già presente nella UI:', mail.id);
+    return;
+  }
+
+  // Verifica campi obbligatori
+  if (!mail.id || !mail.type || !mail.subject || !mail.content || !mail.timestamp) {
+    console.error('Mail mancante di campi obbligatori:', mail);
+    return;
+  }
 
   const mailDiv = document.createElement('div');
   mailDiv.id = `mail-${mail.id}`;
   mailDiv.style.border = '2px solid black';
   mailDiv.style.padding = '10px';
   mailDiv.style.margin = '5px 0';
-  mailDiv.style.background = mail.type === 'received' ? 'var(--ugly-yellow)' : 'white';
+  mailDiv.style.background = (mail.type === 'received') ? 'var(--ugly-yellow)' : 'white';
   
   mailDiv.innerHTML = `
     <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -230,32 +455,36 @@ function addMailToBox(mail) {
     mailBox.appendChild(mailDiv);
   }
 
-  // Suono di notifica per nuove mail
+  console.log('Mail aggiunta con successo alla UI:', mail.id);
+
+  // Se la mail è molto recente, facciamo un suono di notifica
   if (mail.timestamp > Date.now() - 1000) {
     addAmbientSound({ type: 'mail' });
   }
 }
 
-// Funzione per svuotare la casella di posta
+/*******************************************************************
+ * Funzione per svuotare completamente la casella di posta (per test)
+ *******************************************************************/
 async function clearMailbox() {
   if (!confirm('Sei sicuro di voler eliminare tutte le mail? Questa azione non può essere annullata.')) {
     return;
   }
 
   try {
-    // Rimuovi tutte le mail ricevute
+    // Rimuovi mail ricevute
     gun.get('mails').map().once((mail, id) => {
       if (mail && mail.to === user.is.alias) {
         gun.get('mails').get(id).put(null);
       }
     });
 
-    // Rimuovi tutte le mail inviate
+    // Rimuovi mail inviate
     user.get('sent_mails').map().once((mail, id) => {
       user.get('sent_mails').get(id).put(null);
     });
 
-    // Pulisci la visualizzazione
+    // Pulisci l'UI
     const mailsList = document.getElementById('mailsList');
     if (mailsList) {
       mailsList.innerHTML = '';
@@ -267,4 +496,4 @@ async function clearMailbox() {
     console.error('Errore svuotamento casella:', e);
     alert('Errore durante lo svuotamento della casella');
   }
-} 
+}

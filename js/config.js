@@ -4,14 +4,10 @@ const gun = Gun({
     "https://gun-relay.scobrudot.dev/gun",
     "https://peer.wallie.io/gun",
     "https://ruling-mastodon-improved.ngrok-free.app/gun",
-    "https://gun-manhattan.herokuapp.com/gun",
-    "https://gun-matrix.herokuapp.com/gun",
-    "https://gunjs.herokuapp.com/gun",
-    "https://gun-ams1.herokuapp.com/gun",
+    "https://gun-manhattan.herokuapp.com/gun"
   ],
   localStorage: false,
   radisk: false,
- 
 });
 
 const user = gun.user();
@@ -42,17 +38,16 @@ window.addEventListener('online', () => {
     "https://peer.wallie.io/gun",
     "https://ruling-mastodon-improved.ngrok-free.app/gun",
     "https://gun-manhattan.herokuapp.com/gun",
-    "https://gun-matrix.herokuapp.com/gun",
-    "https://gunjs.herokuapp.com/gun",
-    "https://gun-ams1.herokuapp.com/gun",
   ]});
 });
 
 const config = {
   gun: {
     peers: [
-      "https://gun-relay.scobrudot.dev/gun",
-      "https://peer.wallie.io/gun",
+    "https://gun-relay.scobrudot.dev/gun",
+    "https://peer.wallie.io/gun",
+    "https://ruling-mastodon-improved.ngrok-free.app/gun",
+    "https://gun-manhattan.herokuapp.com/gun"
     ]
   },
   radio: {
