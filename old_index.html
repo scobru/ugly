@@ -1,0 +1,3042 @@
+<!DOCTYPE html>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8" />
+    <title>HUGLY</title>
+    <!-- Import Gun e SEA -->
+    <script src="https://cdn.jsdelivr.net/npm/gun/gun.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gun/sea.js"></script>
+    <style>
+      :root {
+        --ugly-green: #90ee90;
+        --ugly-pink: #ffb6c1;
+        --ugly-yellow: #ffff99;
+        --ugly-blue: #87ceeb;
+        --ugly-purple: #dda0dd;
+
+        /* Dark mode colors */
+        --dark-text: #ffffff;
+        --dark-secondary-text: #cccccc;
+        --dark-bg: #1a1a1a;
+        --dark-section: #2d2d2d;
+        --dark-border: #555;
+        --dark-input: #333;
+        --dark-button: #444;
+        --dark-button-hover: #555;
+      }
+
+      /* Dark mode styles */
+      body.dark-mode {
+        background-color: var(--dark-bg) !important;
+        color: var(--dark-text) !important;
+      }
+
+      .dark-mode section {
+        background: var(--dark-section) !important;
+        border-color: var(--dark-border) !important;
+      }
+
+      .dark-mode h1 {
+        background: var(--dark-section) !important;
+        border-color: var(--dark-border) !important;
+        color: #ff69b4 !important;
+        text-shadow: 2px 2px 0 #000 !important;
+      }
+
+      .dark-mode h2 {
+        color: #ff69b4 !important;
+        border-bottom-color: var(--dark-border) !important;
+      }
+
+      .dark-mode input,
+      .dark-mode textarea {
+        background: var(--dark-input) !important;
+        color: var(--dark-text) !important;
+        border-color: var(--dark-border) !important;
+      }
+
+      .dark-mode button {
+        background: var(--dark-button) !important;
+        color: var(--dark-text) !important;
+        border-color: var(--dark-border) !important;
+        box-shadow: 3px 3px 0 var(--dark-border) !important;
+      }
+
+      .dark-mode button:hover {
+        background: var(--dark-button-hover) !important;
+      }
+
+      .dark-mode #userStatus {
+        background: var(--dark-section) !important;
+        color: var(--dark-text) !important;
+      }
+
+      .dark-mode .todo-completed {
+        background: rgba(221, 160, 221, 0.2) !important;
+        color: var(--dark-secondary-text) !important;
+      }
+
+      .dark-mode ul li,
+      .dark-mode #uglyToDoList div,
+      .dark-mode #pwdList div,
+      .dark-mode #reminderList div,
+      .dark-mode .voice-entry {
+        background: rgba(255, 255, 255, 0.1) !important;
+        color: var(--dark-text) !important;
+        border-color: var(--dark-border) !important;
+      }
+
+      .dark-mode small {
+        color: var(--dark-secondary-text) !important;
+        background: rgba(255, 255, 255, 0.1) !important;
+      }
+
+      .dark-mode a {
+        color: #66b3ff !important;
+      }
+
+      .dark-mode #contactList li {
+        background: rgba(255, 255, 255, 0.1) !important;
+      }
+
+      .dark-mode #contactList strong {
+        color: var(--dark-text) !important;
+      }
+
+      .dark-mode #contactList .contact-info {
+        color: var(--dark-secondary-text) !important;
+      }
+
+      .dark-mode #fileList div {
+        background: rgba(255, 255, 255, 0.1) !important;
+      }
+
+      .dark-mode button.delete-btn {
+        background: #ff4444 !important;
+        color: white !important;
+      }
+
+      .dark-mode #notificationStatus {
+        background: var(--dark-section) !important;
+        color: var(--dark-text) !important;
+      }
+
+      /* Dark mode toggle */
+      #darkModeToggle {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 1000;
+        padding: 10px;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        cursor: pointer;
+        transition: transform 0.3s;
+      }
+
+      #darkModeToggle:hover {
+        transform: rotate(360deg);
+      }
+
+      /* Responsive design */
+      @media (max-width: 768px) {
+        body {
+          margin: 10px;
+        }
+
+        section {
+          padding: 10px;
+        }
+
+        h1 {
+          font-size: 1.8em;
+        }
+
+        button {
+          width: 100%;
+          margin: 5px 0;
+        }
+      }
+
+      /* Fun animations */
+      @keyframes rainbow {
+        0% {
+          color: red;
+        }
+        20% {
+          color: yellow;
+        }
+        40% {
+          color: green;
+        }
+        60% {
+          color: blue;
+        }
+        80% {
+          color: purple;
+        }
+        100% {
+          color: red;
+        }
+      }
+
+      @keyframes shake {
+        0%,
+        100% {
+          transform: translateX(0);
+        }
+        25% {
+          transform: translateX(-5px);
+        }
+        75% {
+          transform: translateX(5px);
+        }
+      }
+
+      @keyframes bounce {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-10px);
+        }
+      }
+
+      h1:hover {
+        animation: rainbow 3s infinite;
+      }
+
+      button:active {
+        animation: shake 0.2s ease-in-out;
+      }
+
+      /* Emoji rain effect */
+      .emoji-particle {
+        position: fixed;
+        pointer-events: none;
+        z-index: 9999;
+        animation: explode 1s ease-out forwards;
+        transform-origin: center;
+      }
+
+      @keyframes explode {
+        0% {
+          transform: translate(0, 0) scale(1);
+          opacity: 1;
+        }
+        100% {
+          transform: translate(var(--dx), var(--dy)) scale(0.2);
+          opacity: 0;
+        }
+      }
+
+      /* Scia luminosa */
+      .emoji-particle::after {
+        content: "";
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.5);
+        filter: blur(4px);
+        z-index: -1;
+      }
+
+      /* Hover effects */
+      section {
+        transition: transform 0.3s, box-shadow 0.3s;
+      }
+
+      section:hover {
+        transform: translateY(-5px);
+        box-shadow: 8px 8px 0 #000;
+      }
+
+      body {
+        font-family: "Comic Sans MS", "Comic Sans", cursive;
+        margin: 20px;
+        background-color: #ffecb3;
+        color: #333;
+        transition: background-color 0.3s, color 0.3s;
+      }
+
+      h1 {
+        text-align: center;
+        color: #ff69b4;
+        text-shadow: 2px 2px 0 #000;
+        font-size: 2.5em;
+        margin-bottom: 30px;
+        background: var(--ugly-yellow);
+        padding: 10px;
+        border: 3px dashed #ff1493;
+        border-radius: 15px;
+      }
+
+      h2 {
+        color: #8b008b;
+        border-bottom: 3px dotted #ff69b4;
+        padding-bottom: 5px;
+        margin-top: 0;
+      }
+
+      section {
+        border: 2px solid #000;
+        padding: 15px;
+        margin-bottom: 20px;
+        border-radius: 10px;
+        box-shadow: 5px 5px 0 #000;
+        background: white;
+      }
+
+      section:nth-child(odd) {
+        background: var(--ugly-green);
+      }
+
+      section:nth-child(even) {
+        background: var(--ugly-pink);
+      }
+
+      input,
+      textarea {
+        display: block;
+        margin: 10px 0;
+        padding: 8px;
+        width: 100%;
+        border: 2px solid #000;
+        border-radius: 5px;
+        font-family: inherit;
+        background: white;
+      }
+
+      button {
+        background: var(--ugly-yellow);
+        border: 2px solid #000;
+        padding: 8px 15px;
+        margin: 5px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-family: inherit;
+        font-weight: bold;
+        box-shadow: 3px 3px 0 #000;
+      }
+
+      button:hover {
+        background: var(--ugly-blue);
+        transform: translate(-1px, -1px);
+        box-shadow: 4px 4px 0 #000;
+      }
+
+      button:active {
+        transform: translate(2px, 2px);
+        box-shadow: 1px 1px 0 #000;
+      }
+
+      .hidden {
+        display: none;
+      }
+
+      .todo-completed {
+        text-decoration: line-through;
+        opacity: 0.6;
+        background: var(--ugly-purple);
+        padding: 2px 5px;
+        border-radius: 3px;
+      }
+
+      ul,
+      #uglyToDoList,
+      #pwdList,
+      #reminderList {
+        list-style: none;
+        padding: 0;
+      }
+
+      ul li,
+      #uglyToDoList div,
+      #pwdList div,
+      #reminderList div {
+        margin: 10px 0;
+        padding: 8px;
+        background: rgba(255, 255, 255, 0.7);
+        border: 1px solid #000;
+        border-radius: 5px;
+      }
+
+      .file-preview img {
+        max-width: 100px;
+        margin-right: 10px;
+        vertical-align: middle;
+        border: 2px solid #000;
+        padding: 3px;
+        background: white;
+      }
+
+      #userStatus {
+        text-align: center;
+        padding: 10px;
+        margin: 10px 0;
+        background: var(--ugly-blue);
+        border: 2px solid #000;
+        border-radius: 5px;
+        font-weight: bold;
+      }
+
+      button[disabled] {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      /* Stile per i bottoni di eliminazione */
+      button:contains("❌") {
+        background: #ff6b6b;
+        color: white;
+        padding: 5px 10px;
+        border-radius: 50%;
+      }
+
+      /* Stile per i timestamp */
+      small {
+        font-style: italic;
+        background: rgba(255, 255, 255, 0.5);
+        padding: 2px 5px;
+        border-radius: 3px;
+      }
+
+      /* Animazione per nuovi elementi */
+      @keyframes popIn {
+        from {
+          transform: scale(0.8);
+          opacity: 0;
+        }
+        to {
+          transform: scale(1);
+          opacity: 1;
+        }
+      }
+
+      #uglyToDoList div,
+      #pwdList div,
+      #reminderList div,
+      ul li {
+        animation: popIn 0.3s ease-out;
+      }
+
+      /* Stile per i tab */
+      .tab-container {
+        width: 100%;
+        margin: 20px 0;
+      }
+
+      .tab-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 20px;
+      }
+
+      .tab-button {
+        padding: 10px 20px;
+        background: var(--ugly-yellow);
+        border: 2px solid #000;
+        border-radius: 5px;
+        cursor: pointer;
+        font-family: inherit;
+        font-weight: bold;
+        transition: all 0.3s ease;
+      }
+
+      .tab-button:hover {
+        background: var(--ugly-blue);
+        transform: translateY(-2px);
+      }
+
+      .tab-button.active {
+        background: var(--ugly-pink);
+        transform: translateY(2px);
+        box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.2);
+      }
+
+      .tab-content {
+        display: none;
+      }
+
+      .tab-content.active {
+        display: block;
+        animation: fadeIn 0.5s ease-in-out;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* Dark mode per i tab */
+      .dark-mode .tab-button {
+        background: var(--dark-button);
+        color: var(--dark-text);
+        border-color: var(--dark-border);
+      }
+
+      .dark-mode .tab-button:hover {
+        background: var(--dark-button-hover);
+      }
+
+      .dark-mode .tab-button.active {
+        background: var(--dark-section);
+      }
+    </style>
+  </head>
+  <body>
+    <h1>HUGLY</h1>
+
+    <!-- SEZIONE ACCOUNT: CREAZIONE/LOGIN -->
+    <section>
+      <h2>Account</h2>
+      <input id="username" placeholder="Username" />
+      <input id="password" placeholder="Password" type="password" />
+      <button id="signupBtn">Crea Account</button>
+      <button id="loginBtn">Login</button>
+      <p id="userStatus">Non autenticato</p>
+    </section>
+
+    <!-- TUTTO IL RESTO sarà mostrato/abilitato solo se l'utente è loggato -->
+    <div id="app" class="hidden">
+      <div class="tab-container">
+        <div class="tab-buttons">
+          <button class="tab-button active" data-tab="notes">
+            📝 Note & Testo
+          </button>
+          <button class="tab-button" data-tab="calendar">📅 Calendario</button>
+          <button class="tab-button" data-tab="todo">✅ Todo</button>
+          <button class="tab-button" data-tab="voice">🎤 Voce</button>
+          <button class="tab-button" data-tab="passwords">🔐 Password</button>
+          <button class="tab-button" data-tab="reminders">⏰ Promemoria</button>
+          <button class="tab-button" data-tab="contacts">👥 Contatti</button>
+          <button class="tab-button" data-tab="files">📁 File</button>
+          <button class="tab-button" data-tab="chat">💬 Chat</button>
+          <button class="tab-button" data-tab="mail">📧 Mail</button>
+        </div>
+
+        <!-- Tab Note & Testo -->
+        <div class="tab-content active" id="notes-tab">
+          <!-- UGLY TEXT -->
+          <section>
+            <h2>Ugly Text</h2>
+            <textarea
+              id="uglyTextArea"
+              rows="3"
+              placeholder="Scrivi qualcosa di 'brutto'..."
+            ></textarea>
+          </section>
+
+          <!-- UGLY NOTES -->
+          <section>
+            <h2>Ugly Notes</h2>
+            <input
+              type="text"
+              id="uglyNotesInput"
+              placeholder="Inserisci una nota veloce..."
+            />
+            <button id="uglyNotesButton">Aggiungi Nota</button>
+            <ul id="uglyNotesList"></ul>
+          </section>
+        </div>
+
+        <!-- Tab Calendario -->
+        <div class="tab-content" id="calendar-tab">
+          <!-- UGLY CALENDAR -->
+          <section>
+            <h2>Ugly Calendar</h2>
+            <p>Salva un evento relativo a una data.</p>
+            <input type="date" id="uglyDate" />
+            <input
+              type="text"
+              id="uglyDateEvent"
+              placeholder="Descrizione evento..."
+            />
+            <button id="uglyDateBtn">Salva evento</button>
+            <div id="uglyEvents"></div>
+          </section>
+        </div>
+
+        <!-- Tab Todo -->
+        <div class="tab-content" id="todo-tab">
+          <!-- UGLY TODO -->
+          <section>
+            <h2>Ugly ToDo</h2>
+            <input
+              type="text"
+              id="uglyTodoInput"
+              placeholder="Cosa devi fare?"
+            />
+            <button id="uglyTodoButton">Aggiungi Task</button>
+            <div id="uglyToDoList"></div>
+          </section>
+        </div>
+
+        <!-- Tab Voce -->
+        <div class="tab-content" id="voice-tab">
+          <!-- UGLY VOICE -->
+          <section>
+            <h2>Ugly Voice (demo)</h2>
+            <button id="startVoice">Avvia registrazione</button>
+            <button id="stopVoice" disabled>Ferma registrazione</button>
+            <div id="voiceOutput"></div>
+          </section>
+        </div>
+
+        <!-- Tab Password -->
+        <div class="tab-content" id="passwords-tab">
+          <!-- UGLY PASSWORD MANAGER -->
+          <section>
+            <h2>Ugly Password Manager</h2>
+            <p>
+              <strong>Nota:</strong> i dati qui sono crittografati nello spazio
+              utente.
+            </p>
+            <input
+              type="text"
+              id="pwdDescription"
+              placeholder="Descrizione o servizio"
+            />
+            <input type="text" id="pwdValue" placeholder="Password" />
+            <button id="pwdButton">Salva Password</button>
+            <div id="pwdList"></div>
+          </section>
+        </div>
+
+        <!-- Tab Promemoria -->
+        <div class="tab-content" id="reminders-tab">
+          <!-- UGLY REMINDERS -->
+          <section>
+            <h2>Ugly Reminders (Notifiche)</h2>
+            <p>Imposta data/ora e messaggio per ricevere una notifica.</p>
+            <input type="datetime-local" id="reminderDateTime" />
+            <input type="text" id="reminderMessage" placeholder="Messaggio" />
+            <button id="reminderBtn">Salva Reminder</button>
+            <div id="reminderList"></div>
+            <p id="notificationStatus"></p>
+          </section>
+        </div>
+
+        <!-- Tab Contatti -->
+        <div class="tab-content" id="contacts-tab">
+          <!-- UGLY CONTACTS -->
+          <section>
+            <h2>Ugly Contacts (Rubrica)</h2>
+            <input type="text" id="contactName" placeholder="Nome" />
+            <input type="text" id="contactPhone" placeholder="Telefono" />
+            <input type="text" id="contactEmail" placeholder="Email" />
+            <button id="contactBtn">Salva Contatto</button>
+            <ul id="contactList"></ul>
+          </section>
+        </div>
+
+        <!-- Tab File -->
+        <div class="tab-content" id="files-tab">
+          <!-- UGLY FILE STORAGE -->
+          <section>
+            <h2>Ugly File Storage (demo)</h2>
+            <p>Carica un file in base64 nello spazio utente.</p>
+            <input type="file" id="fileInput" />
+            <button id="fileBtn">Carica File</button>
+            <div id="fileList"></div>
+          </section>
+        </div>
+
+        <!-- Tab Chat -->
+        <div class="tab-content" id="chat-tab">
+          <section>
+            <h2>Ugly Chat Pubblica</h2>
+            <div
+              id="chatMessages"
+              style="
+                height: 400px;
+                overflow-y: auto;
+                margin-bottom: 10px;
+                padding: 10px;
+                border: 1px solid #ccc;
+                border-radius: 5px;
+              "
+            ></div>
+            <div style="display: flex; gap: 10px">
+              <input
+                type="text"
+                id="chatInput"
+                placeholder="Scrivi un messaggio..."
+                style="flex: 1"
+              />
+              <button id="chatSendBtn">Invia</button>
+            </div>
+          </section>
+        </div>
+
+        <!-- Tab Mail -->
+        <div class="tab-content" id="mail-tab">
+          <section>
+            <h2>Ugly Mail</h2>
+            <div style="display: flex; gap: 20px">
+              <!-- Form invio mail -->
+              <div style="flex: 1">
+                <h3>Invia Mail</h3>
+                <input
+                  type="text"
+                  id="mailTo"
+                  placeholder="Alias o chiave pubblica del destinatario"
+                />
+                <input type="text" id="mailSubject" placeholder="Oggetto" />
+                <textarea
+                  id="mailBody"
+                  rows="5"
+                  placeholder="Messaggio..."
+                ></textarea>
+                <button id="mailSendBtn">Invia Mail</button>
+              </div>
+
+              <!-- Box mail ricevute -->
+              <div style="flex: 1">
+                <h3>Mail Ricevute</h3>
+                <div
+                  id="mailBox"
+                  style="
+                    height: 400px;
+                    overflow-y: auto;
+                    padding: 10px;
+                    border: 1px solid #ccc;
+                    border-radius: 5px;
+                  "
+                ></div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Aggiungi questo prima dell'inizializzazione di Gun
+      class UglySoundEffects {
+        constructor() {
+          this.audioContext = null;
+          this.initialized = false;
+          this.initOnFirstInteraction();
+        }
+
+        initOnFirstInteraction() {
+          // Inizializza l'audio al primo click dell'utente
+          const initAudio = () => {
+            if (!this.initialized) {
+              try {
+                this.audioContext = new (window.AudioContext ||
+                  window.webkitAudioContext)();
+                this.initialized = true;
+                console.log("Audio context inizializzato");
+                if (this.audioContext.state === "suspended") {
+                  this.audioContext.resume();
+                }
+              } catch (e) {
+                console.error("Errore inizializzazione audio:", e);
+              }
+            }
+            document.removeEventListener("click", initAudio);
+          };
+          document.addEventListener("click", initAudio);
+        }
+
+        play(soundName) {
+          if (!this.initialized || !this.audioContext) {
+            console.log("Audio non ancora inizializzato");
+            return;
+          }
+
+          try {
+            if (this.audioContext.state === "suspended") {
+              this.audioContext.resume();
+            }
+
+            const oscillator = this.audioContext.createOscillator();
+            const gainNode = this.audioContext.createGain();
+            oscillator.connect(gainNode);
+            gainNode.connect(this.audioContext.destination);
+
+            switch (soundName) {
+              case "pop":
+                oscillator.type = "sine";
+                oscillator.frequency.setValueAtTime(
+                  440,
+                  this.audioContext.currentTime
+                );
+                oscillator.frequency.exponentialRampToValueAtTime(
+                  880,
+                  this.audioContext.currentTime + 0.1
+                );
+                gainNode.gain.setValueAtTime(
+                  0.3,
+                  this.audioContext.currentTime
+                ); // Volume aumentato
+                gainNode.gain.exponentialRampToValueAtTime(
+                  0.01,
+                  this.audioContext.currentTime + 0.1
+                );
+                oscillator.start();
+                oscillator.stop(this.audioContext.currentTime + 0.1);
+                break;
+
+              case "success":
+                oscillator.type = "sine";
+                oscillator.frequency.setValueAtTime(
+                  440,
+                  this.audioContext.currentTime
+                );
+                oscillator.frequency.exponentialRampToValueAtTime(
+                  587.33,
+                  this.audioContext.currentTime + 0.2
+                );
+                gainNode.gain.setValueAtTime(
+                  0.3,
+                  this.audioContext.currentTime
+                ); // Volume aumentato
+                gainNode.gain.exponentialRampToValueAtTime(
+                  0.01,
+                  this.audioContext.currentTime + 0.2
+                );
+                oscillator.start();
+                oscillator.stop(this.audioContext.currentTime + 0.2);
+                break;
+
+              case "delete":
+                oscillator.type = "sine";
+                oscillator.frequency.setValueAtTime(
+                  440,
+                  this.audioContext.currentTime
+                );
+                oscillator.frequency.exponentialRampToValueAtTime(
+                  220,
+                  this.audioContext.currentTime + 0.2
+                );
+                gainNode.gain.setValueAtTime(
+                  0.3,
+                  this.audioContext.currentTime
+                ); // Volume aumentato
+                gainNode.gain.exponentialRampToValueAtTime(
+                  0.01,
+                  this.audioContext.currentTime + 0.2
+                );
+                oscillator.start();
+                oscillator.stop(this.audioContext.currentTime + 0.2);
+                break;
+            }
+          } catch (e) {
+            console.error("Errore riproduzione suono:", e);
+          }
+        }
+      }
+
+      // Inizializza gli effetti sonori
+      const uglySounds = new UglySoundEffects();
+
+      // Rimuovo il listener per i click generici sui bottoni
+      // e lascio solo i suoni per le azioni specifiche
+
+      /************************************************************
+       * 1) INIZIALIZZAZIONE GUN + SEA
+       ************************************************************/
+      var gun = Gun({
+        peers: [
+          "https://gun-matrix.herokuapp.com/gun",
+          "https://gunjs.herokuapp.com/gun",
+          "https://gun-ams1.herokuapp.com/gun",
+        ],
+        localStorage: true,
+        radisk: true,
+        retry: 2500, // Aggiungo retry per gestire meglio le disconnessioni
+        axe: false, // Disabilito axe per ridurre il carico
+      });
+      var user = gun.user();
+
+      // Debug della connessione
+      gun.on("hi", (peer) => {
+        console.log("Peer connesso:", peer);
+      });
+
+      gun.on("bye", (peer) => {
+        console.log("Peer disconnesso:", peer);
+      });
+
+      gun.on("auth", (ack) => {
+        console.log("Autenticazione:", ack);
+      });
+
+      // Riferimenti ai campi per creare/loggare utente
+      var usernameField = document.getElementById("username");
+      var passwordField = document.getElementById("password");
+      var signupBtn = document.getElementById("signupBtn");
+      var loginBtn = document.getElementById("loginBtn");
+      var userStatus = document.getElementById("userStatus");
+      var appDiv = document.getElementById("app");
+
+      // Creazione account
+      signupBtn.addEventListener("click", function () {
+        var uname = usernameField.value.trim();
+        var upass = passwordField.value.trim();
+        if (!uname || !upass) {
+          alert("Inserisci username e password.");
+          return;
+        }
+        user.create(uname, upass, function (ack) {
+          if (ack.err) {
+            alert("Errore creazione account: " + ack.err);
+          } else {
+            alert("Account creato! Ora effettua il login.");
+          }
+        });
+      });
+
+      // Login
+      loginBtn.addEventListener("click", function () {
+        var uname = usernameField.value.trim();
+        var upass = passwordField.value.trim();
+        if (!uname || !upass) {
+          alert("Inserisci username e password.");
+          return;
+        }
+        user.auth(uname, upass, function (ack) {
+          if (ack.err) {
+            alert("Errore login: " + ack.err);
+          } else {
+            userStatus.textContent = "Loggato come: " + uname;
+            appDiv.classList.remove("hidden");
+            // Attendiamo un attimo prima di caricare i dati
+            setTimeout(loadAllData, 500);
+          }
+        });
+      });
+
+      // Se l'utente era già loggato in sessione
+      user.recall({ sessionStorage: true }, function (ack) {
+        if (ack.err) {
+          console.error("Errore recall:", ack.err);
+          return;
+        }
+        if (user.is) {
+          userStatus.textContent = "Loggato come: " + user.is.alias;
+          appDiv.classList.remove("hidden");
+          // Attendiamo un attimo prima di caricare i dati
+          setTimeout(loadAllData, 500);
+        }
+      });
+
+      /************************************************************
+       * FUNZIONE DI CARICAMENTO DEI DATI DOPO IL LOGIN
+       ************************************************************/
+      function loadAllData() {
+        console.log("Caricamento dati...");
+        try {
+          loadUglyText();
+          loadUglyNotes();
+          loadUglyCalendar();
+          loadUglyReminders();
+          loadUglyContacts();
+          loadUglyFiles();
+          loadUglyVoice();
+          loadUglyChat(); // Aggiunto caricamento chat
+          loadUglyMail(); // Aggiunto caricamento mail
+          console.log("Dati caricati con successo");
+        } catch (e) {
+          console.error("Errore nel caricamento dei dati:", e);
+        }
+      }
+
+      /************************************************************
+       * 2) UGLY TEXT (usiamo user.get('uglyText') => cifrato)
+       ************************************************************/
+      var textArea = document.getElementById("uglyTextArea");
+
+      function loadUglyText() {
+        user.get("uglyText").on(function (data) {
+          if (data && data.body !== undefined) {
+            textArea.value = data.body;
+          }
+        });
+      }
+
+      textArea.addEventListener("input", function () {
+        user.get("uglyText").put({ body: textArea.value });
+        addAmbientSound({ type: "text", length: textArea.value.length });
+      });
+
+      /************************************************************
+       * 3) UGLY NOTES
+       ************************************************************/
+      var notesInput = document.getElementById("uglyNotesInput");
+      var notesButton = document.getElementById("uglyNotesButton");
+      var notesList = document.getElementById("uglyNotesList");
+
+      function createDeleteButton() {
+        var deleteBtn = document.createElement("button");
+        deleteBtn.textContent = "❌";
+        deleteBtn.className = "delete-btn";
+        deleteBtn.style.marginLeft = "10px";
+        deleteBtn.addEventListener("click", function () {
+          uglySounds.play("delete");
+        });
+        return deleteBtn;
+      }
+
+      function addNoteToList(noteData, id) {
+        var existing = document.createElement("li");
+        existing.id = "note-" + id;
+
+        var span = document.createElement("span");
+        span.textContent = noteData.text || "";
+
+        var deleteBtn = createDeleteButton();
+        deleteBtn.addEventListener("click", function () {
+          user.get("uglyNotes").get(id).put(null);
+          existing.remove();
+          uglySounds.play("delete");
+        });
+
+        existing.appendChild(span);
+        existing.appendChild(deleteBtn);
+        notesList.appendChild(existing);
+      }
+
+      function loadUglyNotes() {
+        // Puliamo la lista iniziale
+        notesList.innerHTML = "";
+        // Recupera eventuali note già presenti e ascolta in real-time
+        user
+          .get("uglyNotes")
+          .map()
+          .on(function (data, id) {
+            if (!data) {
+              var existing = document.getElementById("note-" + id);
+              if (existing) existing.remove();
+              return;
+            }
+            var existing = document.getElementById("note-" + id);
+            if (!existing) {
+              existing = document.createElement("li");
+              existing.id = "note-" + id;
+
+              var span = document.createElement("span");
+              span.textContent = data.text || "";
+
+              var deleteBtn = createDeleteButton();
+              deleteBtn.addEventListener("click", function () {
+                user.get("uglyNotes").get(id).put(null);
+                existing.remove();
+                uglySounds.play("delete");
+              });
+
+              existing.appendChild(span);
+              existing.appendChild(deleteBtn);
+              notesList.appendChild(existing);
+            } else {
+              existing.querySelector("span").textContent = data.text || "";
+            }
+          });
+      }
+
+      notesButton.addEventListener("click", function () {
+        var nota = notesInput.value.trim();
+        if (!nota) return;
+        user.get("uglyNotes").set({ text: nota });
+        notesInput.value = "";
+        addAmbientSound({ type: "note", text: nota });
+      });
+
+      /************************************************************
+       * 4) UGLY CALENDAR
+       ************************************************************/
+      var dateInput = document.getElementById("uglyDate");
+      var eventInput = document.getElementById("uglyDateEvent");
+      var dateBtn = document.getElementById("uglyDateBtn");
+      var eventsDiv = document.getElementById("uglyEvents");
+
+      function loadUglyCalendar() {
+        // Ripulisci display
+        eventsDiv.innerHTML = "";
+        // Carica tutti gli eventi
+        user.get("uglyCalendar").once(function (data) {
+          if (!data) return;
+          // data qui è un oggetto con date come chiavi
+          Object.keys(data).forEach(function (dt) {
+            if (dt === "_") return; // Metadati Gun
+            addCalendarEvent(dt, data[dt]);
+          });
+        });
+        // Ascolta in tempo reale
+        user
+          .get("uglyCalendar")
+          .map()
+          .on(function (eventDesc, dt) {
+            if (dt === "_") return;
+            if (!eventDesc) {
+              // rimuovi dall'interfaccia
+              var oldP = document.getElementById("cal-" + dt);
+              if (oldP) oldP.remove();
+              return;
+            }
+            addCalendarEvent(dt, eventDesc);
+          });
+      }
+
+      function addCalendarEvent(dt, description) {
+        // Se esiste già, aggiorna
+        var oldP = document.getElementById("cal-" + dt);
+        if (oldP) {
+          oldP.innerHTML = "";
+          var textSpan = document.createElement("span");
+          textSpan.textContent = dt + ": " + description;
+
+          var deleteBtn = document.createElement("button");
+          deleteBtn.textContent = "❌";
+          deleteBtn.style.marginLeft = "10px";
+          deleteBtn.addEventListener("click", function () {
+            user.get("uglyCalendar").get(dt).put(null);
+            oldP.remove();
+            uglySounds.play("delete");
+          });
+
+          oldP.appendChild(textSpan);
+          oldP.appendChild(deleteBtn);
+          return;
+        }
+        // Altrimenti crea
+        var p = document.createElement("p");
+        p.id = "cal-" + dt;
+
+        var textSpan = document.createElement("span");
+        textSpan.textContent = dt + ": " + description;
+
+        var deleteBtn = document.createElement("button");
+        deleteBtn.textContent = "❌";
+        deleteBtn.style.marginLeft = "10px";
+        deleteBtn.addEventListener("click", function () {
+          user.get("uglyCalendar").get(dt).put(null);
+          p.remove();
+          uglySounds.play("delete");
+        });
+
+        p.appendChild(textSpan);
+        p.appendChild(deleteBtn);
+        eventsDiv.appendChild(p);
+      }
+
+      dateBtn.addEventListener("click", function () {
+        var d = dateInput.value;
+        var e = eventInput.value.trim();
+        if (!d || !e) return;
+        user.get("uglyCalendar").get(d).put(e);
+        dateInput.value = "";
+        eventInput.value = "";
+        addAmbientSound({ type: "calendar", date: d, event: e });
+      });
+
+      /************************************************************
+       * 5) UGLY VOICE (demo con Web Speech API)
+       ************************************************************/
+      var startBtn = document.getElementById("startVoice");
+      var stopBtn = document.getElementById("stopVoice");
+      var voiceOutput = document.getElementById("voiceOutput");
+      var recognition;
+
+      if ("webkitSpeechRecognition" in window) {
+        recognition = new webkitSpeechRecognition();
+        recognition.continuous = true;
+        recognition.interimResults = true;
+        recognition.maxAlternatives = 1;
+        recognition.lang = "it-IT";
+
+        // Aggiungo un indicatore di stato più visibile
+        var statusDiv = document.createElement("div");
+        statusDiv.style.padding = "10px";
+        statusDiv.style.margin = "10px 0";
+        statusDiv.style.borderRadius = "5px";
+        statusDiv.style.textAlign = "center";
+        statusDiv.style.fontWeight = "bold";
+        statusDiv.style.border = "2px solid #000";
+        voiceOutput.parentNode.insertBefore(statusDiv, voiceOutput);
+
+        let isRecording = false;
+
+        recognition.onstart = function () {
+          isRecording = true;
+          statusDiv.textContent = "🎤 Registrazione in corso...";
+          statusDiv.style.background = "#FF9999";
+          statusDiv.style.animation = "pulse 1s infinite";
+          console.log("Registrazione avviata");
+          startBtn.disabled = true;
+          stopBtn.disabled = false;
+        };
+
+        recognition.onend = function () {
+          console.log("Registrazione terminata");
+          if (isRecording) {
+            // Riavvia solo se non è stato premuto il pulsante di stop
+            try {
+              setTimeout(() => {
+                recognition.start();
+              }, 100);
+              return;
+            } catch (e) {
+              console.error("Errore riavvio registrazione:", e);
+            }
+          }
+
+          statusDiv.textContent = "Registrazione terminata";
+          statusDiv.style.background = "#99FF99";
+          statusDiv.style.animation = "none";
+          setTimeout(() => {
+            statusDiv.textContent = "Pronto per registrare";
+            statusDiv.style.background = "#FFFFFF";
+          }, 2000);
+          startBtn.disabled = false;
+          stopBtn.disabled = true;
+        };
+
+        recognition.onresult = function (event) {
+          var interimTranscript = "";
+          var finalTranscript = "";
+
+          for (var i = event.resultIndex; i < event.results.length; i++) {
+            var transcript = event.results[i][0].transcript;
+            if (event.results[i].isFinal) {
+              finalTranscript += transcript;
+            } else {
+              interimTranscript += transcript;
+            }
+          }
+
+          if (finalTranscript !== "") {
+            // Salva la registrazione nel database
+            user.get("uglyVoice").set({
+              text: finalTranscript,
+              timestamp: Date.now(),
+            });
+            console.log("Salvata registrazione:", finalTranscript);
+
+            // Feedback visivo del salvataggio
+            const feedback = document.createElement("div");
+            feedback.textContent = "✅ Salvato: " + finalTranscript;
+            feedback.style.padding = "5px";
+            feedback.style.margin = "5px 0";
+            feedback.style.background = "#90EE90";
+            feedback.style.borderRadius = "5px";
+            feedback.style.animation = "popIn 0.3s ease-out";
+            statusDiv.parentNode.insertBefore(feedback, statusDiv.nextSibling);
+            setTimeout(() => feedback.remove(), 3000);
+          }
+
+          // Mostra il testo temporaneo
+          if (interimTranscript !== "") {
+            statusDiv.textContent = "🎤 " + interimTranscript;
+          }
+        };
+
+        recognition.onerror = function (e) {
+          console.error("Errore riconoscimento vocale:", e.error);
+          statusDiv.textContent = "❌ Errore: " + e.error;
+          statusDiv.style.background = "#FF6B6B";
+          statusDiv.style.animation = "none";
+
+          // Gestione specifica per diversi tipi di errori
+          switch (e.error) {
+            case "network":
+              statusDiv.textContent =
+                "❌ Errore di rete. Verifica la tua connessione internet.";
+              break;
+            case "not-allowed":
+              statusDiv.textContent =
+                "❌ Microfono non autorizzato. Concedi i permessi nel browser.";
+              isRecording = false;
+              break;
+            case "no-speech":
+              statusDiv.textContent =
+                "🎤 Nessun audio rilevato. Prova a parlare più forte.";
+              if (isRecording) {
+                try {
+                  recognition.stop();
+                  setTimeout(() => {
+                    if (isRecording) recognition.start();
+                  }, 100);
+                  return;
+                } catch (err) {
+                  console.error("Errore riavvio dopo no-speech:", err);
+                }
+              }
+              break;
+            case "audio-capture":
+              statusDiv.textContent = "❌ Nessun microfono rilevato.";
+              isRecording = false;
+              break;
+            default:
+              statusDiv.textContent = `❌ Errore: ${e.error}. Prova a ricaricare la pagina.`;
+          }
+
+          if (!["no-speech", "audio-capture"].includes(e.error)) {
+            isRecording = false;
+          }
+
+          startBtn.disabled = false;
+          stopBtn.disabled = true;
+
+          // Ripristina lo stato dopo un po'
+          setTimeout(() => {
+            if (!isRecording) {
+              statusDiv.textContent = "Pronto per registrare";
+              statusDiv.style.background = "#FFFFFF";
+            }
+          }, 3000);
+        };
+
+        startBtn.addEventListener("click", function () {
+          try {
+            isRecording = true;
+            recognition.start();
+          } catch (e) {
+            console.error("Errore avvio registrazione:", e);
+            alert("Errore nell'avvio della registrazione");
+          }
+        });
+
+        stopBtn.addEventListener("click", function () {
+          try {
+            isRecording = false;
+            recognition.stop();
+          } catch (e) {
+            console.error("Errore stop registrazione:", e);
+          }
+        });
+
+        // Stile per l'animazione del pulsante di registrazione
+        const style = document.createElement("style");
+        style.textContent = `
+      @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
+      }
+      
+      #voiceOutput {
+        margin-top: 20px;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        max-height: 300px;
+        overflow-y: auto;
+      }
+      
+      .voice-entry {
+        margin: 10px 0;
+        padding: 10px;
+        background: rgba(255,255,255,0.9);
+        border-radius: 5px;
+        box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+        display: flex;
+        align-items: center;
+      }
+      
+      .voice-entry span {
+        flex: 1;
+      }
+      
+      .voice-entry small {
+        color: #666;
+        margin: 0 10px;
+      }
+    `;
+        document.head.appendChild(style);
+
+        // Carica e mostra le registrazioni salvate
+        function loadUglyVoice() {
+          voiceOutput.innerHTML = "<h3>Registrazioni Salvate:</h3>";
+          user
+            .get("uglyVoice")
+            .map()
+            .on(function (data, id) {
+              if (!data) {
+                var existing = document.getElementById("voice-" + id);
+                if (existing) existing.remove();
+                return;
+              }
+
+              var existing = document.getElementById("voice-" + id);
+              if (!existing) {
+                existing = document.createElement("div");
+                existing.id = "voice-" + id;
+                existing.className = "voice-entry";
+
+                var textSpan = document.createElement("span");
+                textSpan.textContent = data.text;
+
+                var timeSpan = document.createElement("small");
+                timeSpan.textContent = new Date(
+                  data.timestamp
+                ).toLocaleString();
+
+                var deleteBtn = document.createElement("button");
+                deleteBtn.textContent = "❌";
+                deleteBtn.className = "delete-btn";
+                deleteBtn.addEventListener("click", function () {
+                  user.get("uglyVoice").get(id).put(null);
+                  existing.remove();
+                  uglySounds.play("delete");
+                });
+
+                existing.appendChild(textSpan);
+                existing.appendChild(timeSpan);
+                existing.appendChild(deleteBtn);
+                voiceOutput.appendChild(existing);
+              } else {
+                existing.querySelector("span").textContent = data.text;
+                existing.querySelector("small").textContent = new Date(
+                  data.timestamp
+                ).toLocaleString();
+              }
+            });
+        }
+
+        // Inizializza lo stato
+        statusDiv.textContent = "Pronto per registrare";
+        statusDiv.style.background = "#FFFFFF";
+      } else {
+        startBtn.disabled = true;
+        stopBtn.disabled = true;
+        voiceOutput.textContent =
+          "La Web Speech API non è supportata in questo browser.";
+      }
+
+      /************************************************************
+       * 6) UGLY TODO
+       ************************************************************/
+      var todoInput = document.getElementById("uglyTodoInput");
+      var todoButton = document.getElementById("uglyTodoButton");
+      var todoListDiv = document.getElementById("uglyToDoList");
+
+      // Aggiunge un nuovo task
+      todoButton.addEventListener("click", function () {
+        var task = todoInput.value.trim();
+        if (!task) return;
+        try {
+          user.get("uglyTodo").set({
+            text: task,
+            done: false,
+            timestamp: Date.now(),
+          });
+          todoInput.value = "";
+          addAmbientSound({ type: "todo", text: task });
+        } catch (e) {
+          console.error("Errore salvataggio todo:", e);
+          alert("Errore nel salvataggio del todo");
+        }
+      });
+
+      // Mostra i task in real-time
+      user
+        .get("uglyTodo")
+        .map()
+        .once(function (data, id) {
+          if (!data) return;
+          createOrUpdateTodo(data, id);
+        });
+
+      user
+        .get("uglyTodo")
+        .map()
+        .on(function (data, id) {
+          if (!data) {
+            var existing = document.getElementById("todo-" + id);
+            if (existing) existing.remove();
+            return;
+          }
+          createOrUpdateTodo(data, id);
+        });
+
+      function createOrUpdateTodo(data, id) {
+        var existing = document.getElementById("todo-" + id);
+        if (!existing) {
+          existing = document.createElement("div");
+          existing.id = "todo-" + id;
+
+          var checkbox = document.createElement("input");
+          checkbox.type = "checkbox";
+          checkbox.checked = !!data.done;
+          checkbox.addEventListener("change", function () {
+            try {
+              user.get("uglyTodo").get(id).put({
+                text: data.text,
+                done: checkbox.checked,
+                timestamp: data.timestamp,
+              });
+            } catch (e) {
+              console.error("Errore aggiornamento todo:", e);
+              checkbox.checked = !checkbox.checked;
+            }
+          });
+
+          var span = document.createElement("span");
+          span.textContent = data.text;
+          span.style.marginLeft = "10px";
+
+          var deleteBtn = createDeleteButton();
+          deleteBtn.addEventListener("click", function () {
+            if (confirm("Sei sicuro di voler eliminare questo task?")) {
+              try {
+                user.get("uglyTodo").get(id).put(null);
+              } catch (e) {
+                console.error("Errore eliminazione todo:", e);
+                alert("Errore nell'eliminazione del todo");
+              }
+            }
+          });
+
+          existing.appendChild(checkbox);
+          existing.appendChild(span);
+          existing.appendChild(deleteBtn);
+          todoListDiv.appendChild(existing);
+        }
+
+        // Aggiorna stato
+        var checkbox = existing.querySelector('input[type="checkbox"]');
+        var span = existing.querySelector("span");
+        checkbox.checked = !!data.done;
+        span.textContent = data.text;
+
+        // Stile completato
+        if (data.done) {
+          span.classList.add("todo-completed");
+        } else {
+          span.classList.remove("todo-completed");
+        }
+      }
+
+      /************************************************************
+       * 7) UGLY PASSWORD MANAGER (con SEA)
+       ************************************************************/
+      var pwdDesc = document.getElementById("pwdDescription");
+      var pwdVal = document.getElementById("pwdValue");
+      var pwdBtn = document.getElementById("pwdButton");
+      var pwdList = document.getElementById("pwdList");
+
+      pwdBtn.addEventListener("click", async function () {
+        var desc = pwdDesc.value.trim();
+        var pass = pwdVal.value.trim();
+        if (!desc || !pass) {
+          alert("Inserisci sia la descrizione che la password");
+          return;
+        }
+
+        try {
+          // Crittografiamo la password prima di salvarla
+          const encPass = await SEA.encrypt(pass, user._.sea);
+          if (!encPass) {
+            throw new Error("Errore nella crittografia della password");
+          }
+
+          // Aggiungiamo un ID univoco e timestamp
+          const pwdData = {
+            id: Date.now().toString(36) + Math.random().toString(36).substr(2),
+            desc: desc,
+            pass: encPass,
+            timestamp: Date.now(),
+          };
+
+          // Salviamo nel database
+          user.get("uglyPasswords").set(pwdData);
+
+          // Puliamo i campi
+          pwdDesc.value = "";
+          pwdVal.value = "";
+
+          // Feedback sonoro
+          addAmbientSound({ type: "password", desc: desc });
+
+          console.log("Password salvata con successo");
+        } catch (e) {
+          console.error("Errore salvataggio password:", e);
+          alert("Errore nel salvataggio della password: " + e.message);
+        }
+      });
+
+      user
+        .get("uglyPasswords")
+        .map()
+        .on(async function (data, id) {
+          if (!data) {
+            var existing = document.getElementById("pwd-" + id);
+            if (existing) existing.remove();
+            return;
+          }
+          var existing = document.getElementById("pwd-" + id);
+          if (!existing) {
+            existing = document.createElement("div");
+            existing.id = "pwd-" + id;
+
+            var textNode = document.createElement("span");
+            textNode.textContent = data.desc;
+
+            var showBtn = document.createElement("button");
+            showBtn.textContent = "Mostra password";
+            showBtn.style.marginLeft = "10px";
+            showBtn.addEventListener("click", async function () {
+              try {
+                const decPass = await SEA.decrypt(data.pass, user._.sea);
+                showBtn.textContent = decPass;
+                setTimeout(() => {
+                  showBtn.textContent = "Mostra password";
+                }, 3000);
+              } catch (e) {
+                console.error("Errore decriptazione:", e);
+                alert("Errore nella lettura della password");
+              }
+            });
+
+            var deleteBtn = document.createElement("button");
+            deleteBtn.textContent = "❌";
+            deleteBtn.style.marginLeft = "10px";
+            deleteBtn.addEventListener("click", function () {
+              user.get("uglyPasswords").get(id).put(null);
+              existing.remove();
+              uglySounds.play("delete");
+            });
+
+            existing.appendChild(textNode);
+            existing.appendChild(showBtn);
+            existing.appendChild(deleteBtn);
+            pwdList.appendChild(existing);
+          } else {
+            // Aggiorniamo il contenuto se cambia
+            existing.querySelector("span").textContent = data.desc;
+          }
+        });
+
+      /************************************************************
+       * 8) UGLY REMINDERS (Notifiche)
+       ************************************************************/
+      var reminderDT = document.getElementById("reminderDateTime");
+      var reminderMsg = document.getElementById("reminderMessage");
+      var reminderBtn = document.getElementById("reminderBtn");
+      var reminderList = document.getElementById("reminderList");
+      var notificationStatus = document.getElementById("notificationStatus");
+
+      // Richiesta permesso notifiche
+      if ("Notification" in window) {
+        Notification.requestPermission().then(function (permission) {
+          notificationStatus.textContent = "Notifiche: " + permission;
+        });
+      } else {
+        notificationStatus.textContent =
+          "Notifiche non supportate dal browser.";
+      }
+
+      reminderBtn.addEventListener("click", function () {
+        var dt = reminderDT.value;
+        var msg = reminderMsg.value.trim();
+        if (!dt || !msg) return;
+        user
+          .get("uglyReminders")
+          .set({ datetime: dt, message: msg, notified: false });
+        reminderDT.value = "";
+        reminderMsg.value = "";
+        addAmbientSound({ type: "reminder", datetime: dt, message: msg });
+      });
+
+      // Visualizza i reminders esistenti
+      function loadUglyReminders() {
+        reminderList.innerHTML = "";
+        user
+          .get("uglyReminders")
+          .map()
+          .on(function (data, id) {
+            if (!data) {
+              var existing = document.getElementById("reminder-" + id);
+              if (existing) existing.remove();
+              return;
+            }
+            var existing = document.getElementById("reminder-" + id);
+            if (!existing) {
+              existing = document.createElement("div");
+              existing.id = "reminder-" + id;
+
+              var textSpan = document.createElement("span");
+              textSpan.textContent = data.datetime + " -> " + data.message;
+              textSpan.style.flex = "1";
+
+              var statusSpan = document.createElement("small");
+              statusSpan.textContent = data.notified
+                ? "✓ Notificato"
+                : "⏰ In attesa";
+              statusSpan.style.marginLeft = "10px";
+
+              var deleteBtn = document.createElement("button");
+              deleteBtn.textContent = "❌";
+              deleteBtn.style.marginLeft = "10px";
+              deleteBtn.addEventListener("click", function () {
+                user.get("uglyReminders").get(id).put(null);
+                existing.remove();
+                uglySounds.play("delete");
+              });
+
+              existing.style.display = "flex";
+              existing.style.alignItems = "center";
+              existing.style.padding = "10px";
+              existing.style.background = data.notified
+                ? "rgba(144, 238, 144, 0.3)"
+                : "rgba(255, 255, 255, 0.7)";
+              existing.style.borderRadius = "5px";
+              existing.style.marginBottom = "5px";
+
+              existing.appendChild(textSpan);
+              existing.appendChild(statusSpan);
+              existing.appendChild(deleteBtn);
+              reminderList.appendChild(existing);
+            } else {
+              var textSpan = existing.querySelector("span");
+              var statusSpan = existing.querySelector("small");
+              textSpan.textContent = data.datetime + " -> " + data.message;
+              statusSpan.textContent = data.notified
+                ? "✓ Notificato"
+                : "⏰ In attesa";
+              existing.style.background = data.notified
+                ? "rgba(144, 238, 144, 0.3)"
+                : "rgba(255, 255, 255, 0.7)";
+            }
+          });
+      }
+
+      // Controllo periodico (molto semplice) per triggerare i reminders
+      setInterval(function () {
+        user
+          .get("uglyReminders")
+          .map()
+          .once(function (data, id) {
+            if (!data) return;
+            var now = new Date();
+            var reminderTime = new Date(data.datetime);
+            if (reminderTime <= now && !data.notified) {
+              // Mostra notifica
+              if (
+                "Notification" in window &&
+                Notification.permission === "granted"
+              ) {
+                new Notification("Ugly Reminder", { body: data.message });
+              } else {
+                alert("Reminder: " + data.message);
+              }
+              // Aggiorna "notified: true"
+              user.get("uglyReminders").get(id).put({
+                datetime: data.datetime,
+                message: data.message,
+                notified: true,
+              });
+            }
+          });
+      }, 15000); // Controllo ogni 15 secondi
+
+      /************************************************************
+       * 9) UGLY CONTACTS (Rubrica)
+       ************************************************************/
+      var contactName = document.getElementById("contactName");
+      var contactPhone = document.getElementById("contactPhone");
+      var contactEmail = document.getElementById("contactEmail");
+      var contactBtn = document.getElementById("contactBtn");
+      var contactList = document.getElementById("contactList");
+
+      contactBtn.addEventListener("click", function () {
+        var n = contactName.value.trim();
+        var p = contactPhone.value.trim();
+        var e = contactEmail.value.trim();
+        if (!n) return alert("Nome obbligatorio");
+        user.get("uglyContacts").set({ name: n, phone: p, email: e });
+        contactName.value = "";
+        contactPhone.value = "";
+        contactEmail.value = "";
+        addAmbientSound({ type: "contact", name: n, phone: p, email: e });
+      });
+
+      function loadUglyContacts() {
+        contactList.innerHTML = "";
+        user
+          .get("uglyContacts")
+          .map()
+          .once(function (data, id) {
+            if (!data) return;
+            createOrUpdateContact(data, id);
+          });
+
+        user
+          .get("uglyContacts")
+          .map()
+          .on(function (data, id) {
+            if (!data) {
+              var existing = document.getElementById("contact-" + id);
+              if (existing) existing.remove();
+              return;
+            }
+            createOrUpdateContact(data, id);
+          });
+      }
+
+      function createOrUpdateContact(data, id) {
+        var existing = document.getElementById("contact-" + id);
+        if (!existing) {
+          existing = document.createElement("li");
+          existing.id = "contact-" + id;
+          existing.style.display = "flex";
+          existing.style.alignItems = "center";
+          existing.style.marginBottom = "10px";
+          existing.style.padding = "10px";
+          existing.style.background = "rgba(255,255,255,0.7)";
+          existing.style.borderRadius = "5px";
+
+          var infoDiv = document.createElement("div");
+          infoDiv.style.flex = "1";
+
+          var nameSpan = document.createElement("strong");
+          nameSpan.textContent = data.name;
+
+          var contactInfo = document.createElement("div");
+          contactInfo.className = "contact-info";
+          contactInfo.style.fontSize = "0.9em";
+          contactInfo.style.marginTop = "5px";
+
+          var deleteBtn = document.createElement("button");
+          deleteBtn.textContent = "❌";
+          deleteBtn.style.marginLeft = "10px";
+          deleteBtn.addEventListener("click", function () {
+            user.get("uglyContacts").get(id).put(null);
+            existing.remove();
+            uglySounds.play("delete");
+          });
+
+          infoDiv.appendChild(nameSpan);
+          infoDiv.appendChild(contactInfo);
+          existing.appendChild(infoDiv);
+          existing.appendChild(deleteBtn);
+          contactList.appendChild(existing);
+        }
+
+        // Aggiorna le informazioni
+        var nameSpan = existing.querySelector("strong");
+        var contactInfo = existing.querySelector(".contact-info");
+        nameSpan.textContent = data.name;
+        contactInfo.innerHTML = `
+      ${data.phone ? "📞 " + data.phone + "<br>" : ""}
+      ${data.email ? "📧 " + data.email : ""}
+    `;
+      }
+
+      /************************************************************
+       * 10) UGLY FILE STORAGE (demo)
+       ************************************************************/
+      var fileInput = document.getElementById("fileInput");
+      var fileBtn = document.getElementById("fileBtn");
+      var fileList = document.getElementById("fileList");
+
+      fileBtn.addEventListener("click", function () {
+        if (!fileInput.files.length) return;
+        var file = fileInput.files[0];
+        var reader = new FileReader();
+        reader.onload = function (e) {
+          var base64Data = e.target.result;
+          user.get("uglyFiles").set({
+            name: file.name,
+            data: base64Data,
+            type: file.type,
+          });
+          addAmbientSound({
+            type: "file",
+            name: file.name,
+            fileType: file.type,
+          });
+        };
+        reader.readAsDataURL(file);
+        fileInput.value = "";
+      });
+
+      function loadUglyFiles() {
+        fileList.innerHTML = "";
+        user
+          .get("uglyFiles")
+          .map()
+          .on(function (data, id) {
+            if (!data) {
+              var existing = document.getElementById("file-" + id);
+              if (existing) existing.remove();
+              return;
+            }
+            var existing = document.getElementById("file-" + id);
+            if (!existing) {
+              existing = document.createElement("div");
+              existing.id = "file-" + id;
+              existing.style.display = "flex";
+              existing.style.alignItems = "center";
+              existing.style.padding = "10px";
+              existing.style.marginBottom = "5px";
+              existing.style.background = "rgba(255,255,255,0.7)";
+              existing.style.borderRadius = "5px";
+
+              // Nome file
+              var nameSpan = document.createElement("span");
+              nameSpan.textContent = data.name;
+              nameSpan.style.flex = "1";
+
+              // Se è immagine, anteprima
+              if (data.type && data.type.startsWith("image/")) {
+                var img = document.createElement("img");
+                img.src = data.data;
+                img.style.maxWidth = "50px";
+                img.style.marginRight = "10px";
+                img.style.borderRadius = "3px";
+                existing.appendChild(img);
+              } else {
+                // Icona per altri tipi di file
+                var icon = document.createElement("span");
+                icon.textContent = "📄 ";
+                icon.style.marginRight = "10px";
+                existing.appendChild(icon);
+              }
+
+              // Link per scaricare
+              var downloadLink = document.createElement("a");
+              downloadLink.href = data.data;
+              downloadLink.textContent = "Scarica";
+              downloadLink.download = data.name;
+              downloadLink.target = "_blank";
+              downloadLink.style.marginLeft = "10px";
+              downloadLink.style.textDecoration = "none";
+              downloadLink.style.color = "#0066cc";
+
+              // Pulsante elimina
+              var deleteBtn = document.createElement("button");
+              deleteBtn.textContent = "❌";
+              deleteBtn.style.marginLeft = "10px";
+              deleteBtn.addEventListener("click", function () {
+                user.get("uglyFiles").get(id).put(null);
+                existing.remove();
+                uglySounds.play("delete");
+              });
+
+              existing.appendChild(nameSpan);
+              existing.appendChild(downloadLink);
+              existing.appendChild(deleteBtn);
+              fileList.appendChild(existing);
+            }
+          });
+      }
+
+      function createEmojiParticle(x, y) {
+        // Rimuovo il suono pop per ogni click
+        const emojis = [
+          "🌟",
+          "💫",
+          "✨",
+          "🎈",
+          "🎉",
+          "🌈",
+          "🦄",
+          "🍕",
+          "🎨",
+          "🎸",
+          "🎆",
+          "🎇",
+          "⭐",
+          "🌠",
+        ];
+
+        // Crea più particelle per ogni click
+        for (let i = 0; i < 12; i++) {
+          const particle = document.createElement("span");
+          particle.className = "emoji-particle";
+          particle.textContent =
+            emojis[Math.floor(Math.random() * emojis.length)];
+
+          // Calcola una direzione casuale
+          const angle = (Math.PI * 2 * i) / 12 + Math.random() * 0.5;
+          const velocity = 100 + Math.random() * 150;
+          const dx = Math.cos(angle) * velocity;
+          const dy = Math.sin(angle) * velocity;
+
+          // Imposta la posizione iniziale
+          particle.style.left = x + "px";
+          particle.style.top = y + "px";
+
+          // Imposta la direzione dell'esplosione
+          particle.style.setProperty("--dx", `${dx}px`);
+          particle.style.setProperty("--dy", `${dy}px`);
+
+          // Aggiungi una rotazione casuale
+          particle.style.transform = `rotate(${Math.random() * 360}deg)`;
+
+          document.body.appendChild(particle);
+
+          // Rimuovi la particella dopo l'animazione
+          particle.addEventListener("animationend", () => {
+            particle.remove();
+          });
+        }
+      }
+
+      document.addEventListener("click", (e) => {
+        createEmojiParticle(e.clientX, e.clientY);
+      });
+
+      // Dark mode toggle con suono più gradevole
+      const darkModeToggle = document.createElement("button");
+      darkModeToggle.id = "darkModeToggle";
+      darkModeToggle.innerHTML = "🌙";
+      document.body.appendChild(darkModeToggle);
+
+      let isDarkMode = false;
+      darkModeToggle.addEventListener("click", () => {
+        uglySounds.play("success");
+        isDarkMode = !isDarkMode;
+        document.body.classList.toggle("dark-mode");
+        darkModeToggle.innerHTML = isDarkMode ? "☀️" : "🌙";
+
+        const rect = darkModeToggle.getBoundingClientRect();
+        createEmojiParticle(
+          rect.left + rect.width / 2,
+          rect.top + rect.height / 2
+        );
+      });
+
+      // Aggiungi suoni ai bottoni principali
+      document.addEventListener("DOMContentLoaded", function () {
+        // Inizializza il contesto audio al primo click dell'utente
+        document.body.addEventListener("click", function initAudio() {
+          uglySounds.audioContext.resume();
+          document.body.removeEventListener("click", initAudio);
+        });
+
+        // Aggiungi suoni ai bottoni (esclusi i pulsanti di eliminazione)
+        const buttons = document.querySelectorAll("button:not(.delete-btn)");
+        buttons.forEach((button) => {
+          button.addEventListener("click", () => {
+            uglySounds.play("pop");
+          });
+        });
+
+        // Aggiungi suoni specifici per alcune azioni
+        document.querySelectorAll(".delete-btn").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            uglySounds.play("delete");
+          });
+        });
+
+        // Suono per il toggle del tema
+        darkModeToggle.addEventListener("click", () => {
+          uglySounds.play("success");
+        });
+      });
+
+      class UglyAmbient {
+        constructor() {
+          try {
+            this.audioContext = new (window.AudioContext ||
+              window.webkitAudioContext)();
+            this.masterGain = this.audioContext.createGain();
+            this.masterGain.gain.value = 0.2;
+            this.masterGain.connect(this.audioContext.destination);
+
+            // Effetti base
+            this.delay = this.audioContext.createDelay();
+            this.delay.delayTime.value = 0.3;
+
+            this.feedbackGain = this.audioContext.createGain();
+            this.feedbackGain.gain.value = 0.3;
+
+            this.filter = this.audioContext.createBiquadFilter();
+            this.filter.type = "lowpass";
+            this.filter.frequency.value = 1000;
+
+            this.reverb = this.createReverb();
+
+            // Connessioni base
+            this.delay.connect(this.feedbackGain);
+            this.feedbackGain.connect(this.delay);
+            this.delay.connect(this.filter);
+            this.filter.connect(this.masterGain);
+            this.reverb.connect(this.masterGain);
+
+            // Loop attivi
+            this.activeLoops = new Map();
+
+            // Caratteristiche per tipo
+            this.soundTypes = {
+              note: {
+                type: "ambient",
+                duration: 4,
+                release: 2,
+                waves: ["sine", "triangle"],
+                scale: [1, 1.2, 1.32, 1.5, 1.68],
+                effects: ["reverb", "delay"]
+              },
+              mail: {
+                type: "sequence",
+                pattern: [0, 4, 7, 12, 16],
+                duration: 0.1,
+                waves: ["sine", "triangle"],
+                effects: ["reverb", "delay"],
+                baseFreq: 440
+              },
+              calendar: {
+                type: "calendar",
+                duration: 0.15,
+                waves: ["sine"],
+                pattern: [0, 4, 7, 12, 7, 4],
+                effects: ["reverb"],
+                baseFreq: 440,
+              },
+              todo: {
+                type: "pluck",
+                duration: 0.2,
+                attack: 0.01,
+                decay: 0.1,
+                scale: [1, 1.125, 1.25, 1.5, 1.6875], // Pentatonica maggiore
+                effects: ["delay"],
+              },
+              password: {
+                type: "sequence",
+                pattern: [0, 4, 7, 12],
+                duration: 0.15,
+                waves: ["square", "sine"],
+                effects: ["filter"],
+              },
+              reminder: {
+                type: "bell",
+                harmonics: [1, 2, 3, 4.2, 5.4],
+                duration: 1,
+                waves: ["sine"],
+                effects: ["reverb"],
+              },
+              contact: {
+                type: "marimba",
+                pattern: [0, 4, 7, 12, 7, 4],
+                duration: 0.1,
+                waves: ["sine"],
+                effects: ["reverb", "delay"],
+              },
+              file: {
+                type: "sweep",
+                frequency: [200, 400],
+                duration: 0.3,
+                waves: ["sawtooth", "triangle"],
+                effects: ["filter"],
+              },
+              text: {
+                type: "drone",
+                baseFreq: 220,
+                harmonics: [1, 1.5, 2, 2.5],
+                modulation: 0.1,
+              },
+              chat: {
+                type: "pluck",
+                duration: 0.2,
+                attack: 0.01,
+                decay: 0.1,
+                scale: [1, 1.5, 2],
+                effects: ["delay", "reverb"],
+              },
+            };
+          } catch (e) {
+            console.error("Errore inizializzazione audio:", e);
+          }
+        }
+
+        createSoundByType(type, data, isDelete = false) {
+          const now = this.audioContext.currentTime;
+          const config = this.soundTypes[type];
+
+          switch (config.type) {
+            case "ambient":
+              return this.createAmbientSound(config, data, isDelete);
+            case "rhythmic":
+              return this.createRhythmicSound(config, data, isDelete);
+            case "pluck":
+              return this.createPluckSound(config, data, isDelete);
+            case "sequence":
+              return this.createSequenceSound(config, data, isDelete);
+            case "bell":
+              return this.createBellSound(config, data, isDelete);
+            case "marimba":
+              return this.createMarimbaSound(config, data, isDelete);
+            case "sweep":
+              return this.createSweepSound(config, data, isDelete);
+            case "drone":
+              return this.createDroneSound(config, data, isDelete);
+            case "calendar":
+              return this.createCalendarSound(config, data, isDelete);
+            case "chat":
+              return this.createChatSound(config, data, isDelete);
+            case "mail":
+              return this.createSequenceSound(config, data, isDelete);
+          }
+        }
+
+        createAmbientSound(config, data, isDelete) {
+          const now = this.audioContext.currentTime;
+          const duration = isDelete ? config.duration / 2 : config.duration;
+          const baseFreq = this.getFreqFromHash(data, 220);
+
+          config.scale.forEach((interval, i) => {
+            config.waves.forEach((wave) => {
+              const osc = this.audioContext.createOscillator();
+              const gain = this.audioContext.createGain();
+
+              osc.type = wave;
+              osc.frequency.value = baseFreq * interval;
+
+              gain.gain.setValueAtTime(0, now);
+              gain.gain.linearRampToValueAtTime(0.1, now + 0.5);
+              gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+
+              osc.connect(gain);
+              if (config.effects.includes("reverb")) gain.connect(this.reverb);
+              if (config.effects.includes("delay")) gain.connect(this.delay);
+              gain.connect(this.masterGain);
+
+              osc.start(now);
+              osc.stop(now + duration + config.release);
+            });
+          });
+        }
+
+        createRhythmicSound(config, data, isDelete) {
+          const now = this.audioContext.currentTime;
+          const stepTime = 60 / config.tempo;
+
+          // Crea un loop ritmico
+          const loopId = Date.now().toString();
+          const loop = {
+            interval: setInterval(() => {
+              config.pattern.forEach((step, i) => {
+                if (step > 0) {
+                  setTimeout(() => {
+                    if (config.sounds.includes("kick")) {
+                      this.createKickDrum(now + i * stepTime);
+                    }
+                    if (config.sounds.includes("hihat")) {
+                      this.createHiHat(now + i * stepTime);
+                    }
+                  }, i * stepTime * 1000);
+                }
+              });
+            }, config.pattern.length * stepTime * 1000),
+            startTime: now,
+          };
+
+          this.activeLoops.set(loopId, loop);
+
+          // Ferma il loop dopo un po'
+          setTimeout(() => {
+            clearInterval(loop.interval);
+            this.activeLoops.delete(loopId);
+          }, 4000);
+        }
+
+        createKickDrum(time) {
+          const osc = this.audioContext.createOscillator();
+          const gain = this.audioContext.createGain();
+
+          osc.frequency.setValueAtTime(150, time);
+          osc.frequency.exponentialRampToValueAtTime(40, time + 0.1);
+
+          gain.gain.setValueAtTime(0.3, time);
+          gain.gain.exponentialRampToValueAtTime(0.001, time + 0.1);
+
+          osc.connect(gain);
+          gain.connect(this.masterGain);
+
+          osc.start(time);
+          osc.stop(time + 0.1);
+        }
+
+        createHiHat(time) {
+          const bufferSize = 2 * this.audioContext.sampleRate;
+          const buffer = this.audioContext.createBuffer(
+            1,
+            bufferSize,
+            this.audioContext.sampleRate
+          );
+          const output = buffer.getChannelData(0);
+
+          for (let i = 0; i < bufferSize; i++) {
+            output[i] = Math.random() * 2 - 1;
+          }
+
+          const noise = this.audioContext.createBufferSource();
+          noise.buffer = buffer;
+
+          const filter = this.audioContext.createBiquadFilter();
+          filter.type = "highpass";
+          filter.frequency.value = 7000;
+
+          const gain = this.audioContext.createGain();
+          gain.gain.setValueAtTime(0.1, time);
+          gain.gain.exponentialRampToValueAtTime(0.001, time + 0.05);
+
+          noise.connect(filter);
+          filter.connect(gain);
+          gain.connect(this.masterGain);
+
+          noise.start(time);
+          noise.stop(time + 0.05);
+        }
+
+        addSound(data, isDelete = false) {
+          const type = data.type || "note";
+          this.createSoundByType(type, data, isDelete);
+        }
+
+        getFreqFromHash(data, baseFreq = 220) {
+          const hash = this.generateHash(data);
+          return baseFreq * (1 + (parseInt(hash.substr(0, 2), 16) % 12) / 12);
+        }
+
+        generateHash(data) {
+          const str = JSON.stringify(data);
+          let hash = 0;
+          for (let i = 0; i < str.length; i++) {
+            const char = str.charCodeAt(i);
+            hash = (hash << 5) - hash + char;
+            hash = hash & hash;
+          }
+          return Math.abs(hash).toString(16);
+        }
+
+        createReverb() {
+          const delays = [0.03, 0.05, 0.07, 0.11];
+          const gains = [0.3, 0.2, 0.1, 0.05];
+          const merger = this.audioContext.createGain();
+
+          delays.forEach((time, i) => {
+            const delay = this.audioContext.createDelay();
+            const gain = this.audioContext.createGain();
+            delay.delayTime.value = time;
+            gain.gain.value = gains[i];
+            delay.connect(gain);
+            gain.connect(merger);
+          });
+
+          return merger;
+        }
+
+        createPluckSound(config, data, isDelete) {
+          const now = this.audioContext.currentTime;
+          const duration = isDelete ? config.duration / 2 : config.duration;
+          const baseFreq = this.getFreqFromHash(data, 440);
+
+          config.scale.forEach((interval, i) => {
+            const osc = this.audioContext.createOscillator();
+            const gain = this.audioContext.createGain();
+
+            osc.frequency.value = baseFreq * interval;
+
+            gain.gain.setValueAtTime(0, now);
+            gain.gain.linearRampToValueAtTime(0.2, now + config.attack);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + config.decay);
+
+            osc.connect(gain);
+            if (config.effects.includes("delay")) gain.connect(this.delay);
+            gain.connect(this.masterGain);
+
+            osc.start(now);
+            osc.stop(now + duration);
+          });
+        }
+
+        createSequenceSound(config, data, isDelete) {
+          const now = this.audioContext.currentTime;
+          const baseFreq = this.getFreqFromHash(data, 330);
+
+          config.pattern.forEach((note, i) => {
+            config.waves.forEach((wave) => {
+              const osc = this.audioContext.createOscillator();
+              const gain = this.audioContext.createGain();
+
+              osc.type = wave;
+              osc.frequency.value = baseFreq * Math.pow(2, note / 12);
+
+              gain.gain.setValueAtTime(0, now + i * config.duration);
+              gain.gain.linearRampToValueAtTime(
+                0.1,
+                now + i * config.duration + 0.01
+              );
+              gain.gain.exponentialRampToValueAtTime(
+                0.001,
+                now + (i + 1) * config.duration
+              );
+
+              osc.connect(gain);
+              if (config.effects.includes("filter")) gain.connect(this.filter);
+              gain.connect(this.masterGain);
+
+              osc.start(now + i * config.duration);
+              osc.stop(now + (i + 1) * config.duration);
+            });
+          });
+        }
+
+        createBellSound(config, data, isDelete) {
+          const now = this.audioContext.currentTime;
+          const baseFreq = this.getFreqFromHash(data, 880);
+
+          config.harmonics.forEach((harmonic) => {
+            const osc = this.audioContext.createOscillator();
+            const gain = this.audioContext.createGain();
+
+            osc.type = config.waves[0];
+            osc.frequency.value = baseFreq * harmonic;
+
+            gain.gain.setValueAtTime(0.2 / harmonic, now);
+            gain.gain.exponentialRampToValueAtTime(
+              0.001,
+              now + config.duration
+            );
+
+            osc.connect(gain);
+            if (config.effects.includes("reverb")) gain.connect(this.reverb);
+            gain.connect(this.masterGain);
+
+            osc.start(now);
+            osc.stop(now + config.duration);
+          });
+        }
+
+        createMarimbaSound(config, data, isDelete) {
+          const now = this.audioContext.currentTime;
+          const baseFreq = this.getFreqFromHash(data, 440);
+
+          config.pattern.forEach((note, i) => {
+            const osc = this.audioContext.createOscillator();
+            const gain = this.audioContext.createGain();
+
+            osc.type = config.waves[0];
+            osc.frequency.value = baseFreq * Math.pow(2, note / 12);
+
+            gain.gain.setValueAtTime(0, now + i * config.duration);
+            gain.gain.linearRampToValueAtTime(
+              0.2,
+              now + i * config.duration + 0.01
+            );
+            gain.gain.exponentialRampToValueAtTime(
+              0.001,
+              now + (i + 1) * config.duration
+            );
+
+            osc.connect(gain);
+            if (config.effects.includes("reverb")) gain.connect(this.reverb);
+            if (config.effects.includes("delay")) gain.connect(this.delay);
+            gain.connect(this.masterGain);
+
+            osc.start(now + i * config.duration);
+            osc.stop(now + (i + 1) * config.duration);
+          });
+        }
+
+        createSweepSound(config, data, isDelete) {
+          const now = this.audioContext.currentTime;
+          const duration = isDelete ? config.duration / 2 : config.duration;
+
+          config.waves.forEach((wave) => {
+            const osc = this.audioContext.createOscillator();
+            const gain = this.audioContext.createGain();
+
+            osc.type = wave;
+            osc.frequency.setValueAtTime(config.frequency[0], now);
+            osc.frequency.exponentialRampToValueAtTime(
+              config.frequency[1],
+              now + duration
+            );
+
+            gain.gain.setValueAtTime(0.1, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+
+            osc.connect(gain);
+            if (config.effects.includes("filter")) gain.connect(this.filter);
+            gain.connect(this.masterGain);
+
+            osc.start(now);
+            osc.stop(now + duration);
+          });
+        }
+
+        createDroneSound(config, data, isDelete) {
+          const now = this.audioContext.currentTime;
+          const baseFreq = config.baseFreq;
+
+          config.harmonics.forEach((harmonic) => {
+            const osc = this.audioContext.createOscillator();
+            const gain = this.audioContext.createGain();
+            const lfo = this.audioContext.createOscillator();
+            const lfoGain = this.audioContext.createGain();
+
+            osc.frequency.value = baseFreq * harmonic;
+            lfo.frequency.value = config.modulation;
+            lfoGain.gain.value = 5;
+
+            lfo.connect(lfoGain);
+            lfoGain.connect(osc.frequency);
+
+            gain.gain.setValueAtTime(0.1 / harmonic, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 2);
+
+            osc.connect(gain);
+            gain.connect(this.masterGain);
+
+            osc.start(now);
+            lfo.start(now);
+            osc.stop(now + 2);
+            lfo.stop(now + 2);
+          });
+        }
+
+        createCalendarSound(config, data, isDelete) {
+          const now = this.audioContext.currentTime;
+          const baseFreq = config.baseFreq;
+          const pattern = config.pattern;
+          const duration = config.duration;
+
+          pattern.forEach((note, i) => {
+            const osc = this.audioContext.createOscillator();
+            const gain = this.audioContext.createGain();
+
+            osc.type = "sine";
+            osc.frequency.value = baseFreq * Math.pow(2, note / 12);
+
+            gain.gain.setValueAtTime(0, now + i * duration);
+            gain.gain.linearRampToValueAtTime(0.2, now + i * duration + 0.01);
+            gain.gain.exponentialRampToValueAtTime(
+              0.001,
+              now + (i + 1) * duration
+            );
+
+            osc.connect(gain);
+            gain.connect(this.reverb);
+            gain.connect(this.masterGain);
+
+            osc.start(now + i * duration);
+            osc.stop(now + (i + 1) * duration);
+          });
+        }
+
+        createChatSound(config, data, isDelete) {
+          const now = this.audioContext.currentTime;
+          const baseFreq = config.baseFreq;
+          const pattern = config.pattern;
+          const duration = config.duration;
+
+          pattern.forEach((note, i) => {
+            const osc = this.audioContext.createOscillator();
+            const gain = this.audioContext.createGain();
+
+            osc.type = "sine";
+            osc.frequency.value = baseFreq * Math.pow(2, note / 12);
+
+            gain.gain.setValueAtTime(0, now + i * duration);
+            gain.gain.linearRampToValueAtTime(0.2, now + i * duration + 0.01);
+            gain.gain.exponentialRampToValueAtTime(
+              0.001,
+              now + (i + 1) * duration
+            );
+
+            osc.connect(gain);
+            gain.connect(this.reverb);
+            gain.connect(this.masterGain);
+
+            osc.start(now + i * duration);
+            osc.stop(now + (i + 1) * duration);
+          });
+        }
+      }
+
+      // Inizializza l'ambient sound
+      const uglyAmbient = new UglyAmbient();
+
+      // Aggiungi gestione eventi per i vari input
+      function addAmbientSound(data, isDelete = false) {
+        if (uglyAmbient.audioContext.state === "suspended") {
+          uglyAmbient.audioContext.resume();
+        }
+        uglyAmbient.addSound(data, isDelete);
+      }
+
+      // Aggiungi agli eventi esistenti
+      notesButton.addEventListener("click", function () {
+        var nota = notesInput.value.trim();
+        if (!nota) return;
+        user.get("uglyNotes").set({ text: nota });
+        notesInput.value = "";
+        addAmbientSound({ type: "note", text: nota });
+      });
+
+      // Aggiungi suono anche per gli eventi del calendario
+      dateBtn.addEventListener("click", function () {
+        var d = dateInput.value;
+        var e = eventInput.value.trim();
+        if (!d || !e) return;
+        user.get("uglyCalendar").get(d).put(e);
+        dateInput.value = "";
+        eventInput.value = "";
+        addAmbientSound({ type: "calendar", date: d, event: e });
+      });
+
+      // Aggiungi suono anche per gli eventi del calendario
+      dateBtn.addEventListener("click", function () {
+        var d = dateInput.value;
+        var e = eventInput.value.trim();
+        if (!d || !e) return;
+        user.get("uglyCalendar").get(d).put(e);
+        dateInput.value = "";
+        eventInput.value = "";
+        addAmbientSound({ type: "calendar", date: d, event: e });
+      });
+
+      // Aggiungi suono anche per gli eventi del calendario
+      dateBtn.addEventListener("click", function () {
+        var d = dateInput.value;
+        var e = eventInput.value.trim();
+        if (!d || !e) return;
+        user.get("uglyCalendar").get(d).put(e);
+        dateInput.value = "";
+        eventInput.value = "";
+        addAmbientSound({ type: "calendar", date: d, event: e });
+      });
+
+      // Aggiungi il suono di eliminazione ai pulsanti delete
+      document.querySelectorAll(".delete-btn").forEach((btn) => {
+        btn.addEventListener("click", function () {
+          addAmbientSound({ type: "delete", timestamp: Date.now() }, true);
+        });
+      });
+
+      // Aggiungi suono per i contatti
+      contactBtn.addEventListener("click", function () {
+        var n = contactName.value.trim();
+        var p = contactPhone.value.trim();
+        var e = contactEmail.value.trim();
+        if (!n) return alert("Nome obbligatorio");
+        user.get("uglyContacts").set({ name: n, phone: p, email: e });
+        contactName.value = "";
+        contactPhone.value = "";
+        contactEmail.value = "";
+        addAmbientSound({ type: "contact", name: n, phone: p, email: e });
+      });
+
+      // Aggiungi suono per i file
+      fileBtn.addEventListener("click", function () {
+        if (!fileInput.files.length) return;
+        var file = fileInput.files[0];
+        var reader = new FileReader();
+        reader.onload = function (e) {
+          var base64Data = e.target.result;
+          user.get("uglyFiles").set({
+            name: file.name,
+            data: base64Data,
+            type: file.type,
+          });
+          addAmbientSound({
+            type: "file",
+            name: file.name,
+            fileType: file.type,
+          });
+        };
+        reader.readAsDataURL(file);
+        fileInput.value = "";
+      });
+
+      // Aggiungi suono per i reminder
+      reminderBtn.addEventListener("click", function () {
+        var dt = reminderDT.value;
+        var msg = reminderMsg.value.trim();
+        if (!dt || !msg) return;
+        user
+          .get("uglyReminders")
+          .set({ datetime: dt, message: msg, notified: false });
+        reminderDT.value = "";
+        reminderMsg.value = "";
+        addAmbientSound({ type: "reminder", datetime: dt, message: msg });
+      });
+
+      // Aggiungi suono per il testo
+      textArea.addEventListener(
+        "input",
+        debounce(function () {
+          user.get("uglyText").put({ body: textArea.value });
+          addAmbientSound({ type: "text", length: textArea.value.length });
+        }, 1000)
+      ); // Debounce per non generare troppi suoni durante la digitazione
+
+      // Funzione debounce per limitare la frequenza degli eventi
+      function debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+          const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+          };
+          clearTimeout(timeout);
+          timeout = setTimeout(later, wait);
+        };
+      }
+
+      // Gestione dei tab
+      document.addEventListener("DOMContentLoaded", function () {
+        const tabButtons = document.querySelectorAll(".tab-button");
+        const tabContents = document.querySelectorAll(".tab-content");
+
+        tabButtons.forEach((button) => {
+          button.addEventListener("click", () => {
+            const tabId = button.getAttribute("data-tab");
+
+            // Rimuovi active da tutti i bottoni e contenuti
+            tabButtons.forEach((btn) => btn.classList.remove("active"));
+            tabContents.forEach((content) =>
+              content.classList.remove("active")
+            );
+
+            // Aggiungi active al bottone e contenuto corrente
+            button.classList.add("active");
+            document.getElementById(`${tabId}-tab`).classList.add("active");
+
+            // Suono di cambio tab
+            uglySounds.play("pop");
+          });
+        });
+      });
+
+      // Inizializzazione della chat
+      var chatInput = document.getElementById("chatInput");
+      var chatSendBtn = document.getElementById("chatSendBtn");
+      var chatMessages = document.getElementById("chatMessages");
+
+      // Caricamento messaggi
+      function loadUglyChat() {
+        chatMessages.innerHTML = "";
+        const processedMessages = new Set();
+
+        gun
+          .get("uglyChat")
+          .map()
+          .on(function (data, id) {
+            if (!data || !data.time || !data.text) return;
+
+            // Usa un ID univoco che include tutti i dati del messaggio
+            const messageId = `${data.user}-${data.time}-${data.text}`;
+            if (processedMessages.has(messageId)) return;
+            processedMessages.add(messageId);
+
+            const existingMessage = document.querySelector(
+              `[data-message-id="${messageId}"]`
+            );
+            if (existingMessage) return;
+
+            addChatMessage(data, messageId);
+          });
+      }
+
+      // Funzione per aggiungere un messaggio alla chat
+      function addChatMessage(data, messageId) {
+        const messageDiv = document.createElement("div");
+        messageDiv.dataset.messageId = messageId;
+        messageDiv.dataset.time = data.time;
+        messageDiv.style.marginBottom = "10px";
+        messageDiv.style.padding = "8px";
+        messageDiv.style.borderRadius = "5px";
+        messageDiv.style.background =
+          data.user === user.is.alias ? "var(--ugly-pink)" : "var(--ugly-blue)";
+        messageDiv.style.animation = "popIn 0.3s ease-out";
+
+        const userSpan = document.createElement("strong");
+        userSpan.textContent = data.user || "Anonimo";
+        userSpan.style.marginRight = "10px";
+
+        const timeSpan = document.createElement("small");
+        timeSpan.textContent = new Date(data.time).toLocaleTimeString();
+        timeSpan.style.marginLeft = "10px";
+        timeSpan.style.opacity = "0.7";
+
+        const messageSpan = document.createElement("span");
+        messageSpan.textContent = data.text;
+
+        messageDiv.appendChild(userSpan);
+        messageDiv.appendChild(messageSpan);
+        messageDiv.appendChild(timeSpan);
+
+        // Inserisci i messaggi in ordine cronologico
+        let inserted = false;
+        for (let child of chatMessages.children) {
+          const childTime = parseInt(child.dataset.time || 0);
+          if (data.time < childTime) {
+            chatMessages.insertBefore(messageDiv, child);
+            inserted = true;
+            break;
+          }
+        }
+        if (!inserted) {
+          chatMessages.appendChild(messageDiv);
+        }
+
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+
+        // Suono di notifica solo per messaggi nuovi degli altri
+        if (data.user !== user.is.alias && data.time > Date.now() - 1000) {
+          addAmbientSound({ type: "chat", text: data.text });
+        }
+      }
+
+      // Invio messaggio
+      chatSendBtn.addEventListener("click", function () {
+        const text = chatInput.value.trim();
+        if (!text || !user.is) return;
+
+        const time = Date.now();
+        const messageData = {
+          user: user.is.alias || "Anonimo",
+          text: text,
+          time: time,
+        };
+
+        // Usa put invece di set per evitare duplicati
+        gun.get("uglyChat").get(time).put(messageData);
+
+        chatInput.value = "";
+        addAmbientSound({ type: "chat", text: text });
+      });
+
+      // Invio con Enter
+      chatInput.addEventListener("keypress", function (e) {
+        if (e.key === "Enter") {
+          chatSendBtn.click();
+        }
+      });
+
+      // Inizializzazione HUGLY MAIL
+      var mailTo = document.getElementById("mailTo");
+      var mailSubject = document.getElementById("mailSubject");
+      var mailBody = document.getElementById("mailBody");
+      var mailSendBtn = document.getElementById("mailSendBtn");
+      var mailBox = document.getElementById("mailBox");
+
+      // Funzione per inviare una mail
+      mailSendBtn.addEventListener("click", async function () {
+        const to = mailTo.value.trim();
+        const subject = mailSubject.value.trim();
+        const body = mailBody.value.trim();
+
+        if (!to || !subject || !body || !user.is) {
+          alert("Compila tutti i campi");
+          return;
+        }
+
+        try {
+          // Cerca l'utente destinatario
+          let to_pub = await new Promise((resolve) => {
+            if (to.includes("~")) {
+              // È una chiave pubblica
+              resolve(to);
+            } else {
+              // È un alias, cerchiamo la chiave pubblica
+              gun.get(`~@${to}`).once((data) => {
+                if (!data) {
+                  resolve(null);
+                  return;
+                }
+                // Trova la chiave pubblica nell'oggetto data
+                for (let key in data) {
+                  if (key.startsWith("~")) {
+                    resolve(key);
+                    return;
+                  }
+                }
+                resolve(null);
+              });
+            }
+          });
+
+          if (!to_pub) {
+            alert("Destinatario non trovato");
+            return;
+          }
+
+          // Rimuovi il prefisso "~" se presente
+          to_pub = to_pub.replace("~", "");
+
+          // Crea il messaggio
+          const message = {
+            from: user.is.alias,
+            from_pub: user.is.pub,
+            subject: subject,
+            body: body,
+            time: Date.now()
+          };
+
+          // Cripta il messaggio
+          const enc = await SEA.encrypt(message, user._.sea);
+
+          // Salva il messaggio nella mailbox del destinatario
+          gun.get(`~${to_pub}`).get("mails").set({
+            msg: enc,
+            time: message.time
+          });
+
+          // Pulisci i campi
+          mailTo.value = "";
+          mailSubject.value = "";
+          mailBody.value = "";
+
+          addAmbientSound({ type: "mail", action: "send" });
+          alert("Mail inviata con successo!");
+
+        } catch (e) {
+          console.error("Errore invio mail:", e);
+          alert("Errore nell'invio della mail");
+        }
+      });
+
+      // Funzione per caricare le mail
+      async function loadUglyMail() {
+        mailBox.innerHTML = "";
+        const processedMails = new Set();
+
+        // Carica le mail dell'utente corrente
+        gun.get(`~${user.is.pub}`).get("mails").map().on(async function(data) {
+          if (!data || !data.msg || !data.time) return;
+
+          // Evita duplicati
+          const mailId = `${data.time}`;
+          if (processedMails.has(mailId)) return;
+          processedMails.add(mailId);
+
+          try {
+            // Decripta il messaggio
+            const message = await SEA.decrypt(data.msg, user._.sea);
+            if (!message) return;
+
+            // Aggiungi la mail alla visualizzazione
+            addMailToBox(message, mailId);
+          } catch (e) {
+            console.error("Errore decrittazione mail:", e);
+          }
+        });
+      }
+
+      // Funzione per aggiungere una mail al box
+      function addMailToBox(message, mailId) {
+        const mailDiv = document.createElement("div");
+        mailDiv.id = `mail-${mailId}`;
+        mailDiv.style.marginBottom = "15px";
+        mailDiv.style.padding = "10px";
+        mailDiv.style.background = "rgba(255,255,255,0.7)";
+        mailDiv.style.borderRadius = "5px";
+        mailDiv.style.animation = "popIn 0.3s ease-out";
+
+        const header = document.createElement("div");
+        header.style.marginBottom = "5px";
+
+        const from = document.createElement("strong");
+        from.textContent = `Da: ${message.from}`;
+
+        const subject = document.createElement("div");
+        subject.style.fontWeight = "bold";
+        subject.textContent = `Oggetto: ${message.subject}`;
+
+        const time = document.createElement("small");
+        time.textContent = new Date(message.time).toLocaleString();
+        time.style.marginLeft = "10px";
+        time.style.opacity = "0.7";
+
+        const body = document.createElement("div");
+        body.style.marginTop = "10px";
+        body.style.whiteSpace = "pre-wrap";
+        body.textContent = message.body;
+
+        const deleteBtn = document.createElement("button");
+        deleteBtn.textContent = "❌";
+        deleteBtn.style.float = "right";
+        deleteBtn.addEventListener("click", function () {
+          gun.get(`~${user.is.pub}`).get("mails").get(mailId).put(null);
+          mailDiv.remove();
+          uglySounds.play("delete");
+        });
+
+        header.appendChild(from);
+        header.appendChild(time);
+        header.appendChild(deleteBtn);
+        mailDiv.appendChild(header);
+        mailDiv.appendChild(subject);
+        mailDiv.appendChild(body);
+
+        // Inserisci in ordine cronologico inverso (più recenti in alto)
+        let inserted = false;
+        for (let child of mailBox.children) {
+          const childTime = parseInt(child.id.split("-")[1]);
+          if (message.time > childTime) {
+            mailBox.insertBefore(mailDiv, child);
+            inserted = true;
+            break;
+          }
+        }
+        if (!inserted) {
+          mailBox.appendChild(mailDiv);
+        }
+
+        // Suono di notifica per nuove mail
+        if (message.time > Date.now() - 1000) {
+          addAmbientSound({ type: "mail", action: "receive" });
+        }
+      }
+
+      this.soundTypes.mail = {
+        type: "sequence",
+        pattern: [0, 4, 7, 12, 16],
+        duration: 0.1,
+        waves: ["sine", "triangle"],
+        effects: ["reverb", "delay"],
+      };
+
+      // Aggiungi loadUglyMail a loadAllData
+      function loadAllData() {
+        console.log("Caricamento dati...");
+        try {
+          loadUglyText();
+          loadUglyNotes();
+          loadUglyCalendar();
+          loadUglyReminders();
+          loadUglyContacts();
+          loadUglyFiles();
+          loadUglyVoice();
+          loadUglyChat();
+          loadUglyMail(); // Aggiunto caricamento mail
+          console.log("Dati caricati con successo");
+        } catch (e) {
+          console.error("Errore nel caricamento dei dati:", e);
+        }
+      }
+
+      // Aggiungi suono per le mail
+      this.soundTypes.mail = {
+        type: "sequence",
+        pattern: [0, 4, 7, 12, 16],
+        duration: 0.1,
+        waves: ["sine", "triangle"],
+        effects: ["reverb", "delay"],
+      };
+    </script>
+  </body>
+</html>

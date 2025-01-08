@@ -1,0 +1,158 @@
+:root {
+  --ugly-green: #90ee90;
+  --ugly-pink: #ffb6c1;
+  --ugly-yellow: #ffff99;
+  --ugly-blue: #87ceeb;
+  --ugly-purple: #dda0dd;
+}
+
+body {
+  font-family: "Comic Sans MS", "Comic Sans", cursive;
+  margin: 20px;
+  background-color: #ffecb3;
+  color: #333;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+h1 {
+  text-align: center;
+  color: #ff69b4;
+  text-shadow: 2px 2px 0 #000;
+  font-size: 2.5em;
+  margin-bottom: 30px;
+  background: var(--ugly-yellow);
+  padding: 10px;
+  border: 3px dashed #ff1493;
+  border-radius: 15px;
+}
+
+h2 {
+  color: #8b008b;
+  border-bottom: 3px dotted #ff69b4;
+  padding-bottom: 5px;
+  margin-top: 0;
+}
+
+section {
+  border: 2px solid #000;
+  padding: 15px;
+  margin-bottom: 20px;
+  border-radius: 10px;
+  box-shadow: 5px 5px 0 #000;
+  background: white;
+}
+
+section:nth-child(odd) {
+  background: var(--ugly-green);
+}
+
+section:nth-child(even) {
+  background: var(--ugly-pink);
+}
+
+input,
+textarea {
+  display: block;
+  margin: 10px 0;
+  padding: 8px;
+  width: 100%;
+  border: 2px solid #000;
+  border-radius: 5px;
+  font-family: inherit;
+  background: white;
+}
+
+button {
+  background: var(--ugly-yellow);
+  border: 2px solid #000;
+  padding: 8px 15px;
+  margin: 5px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: bold;
+  box-shadow: 3px 3px 0 #000;
+}
+
+button:hover {
+  background: var(--ugly-blue);
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 4px 0 #000;
+}
+
+button:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 #000;
+}
+
+.hidden {
+  display: none;
+}
+
+/* Stili specifici per i moduli */
+.todo-completed {
+  text-decoration: line-through;
+  opacity: 0.6;
+  background: var(--ugly-purple);
+  padding: 2px 5px;
+  border-radius: 3px;
+}
+
+ul,
+#uglyToDoList,
+#pwdList,
+#reminderList {
+  list-style: none;
+  padding: 0;
+}
+
+ul li,
+#uglyToDoList div,
+#pwdList div,
+#reminderList div {
+  margin: 10px 0;
+  padding: 8px;
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid #000;
+  border-radius: 5px;
+}
+
+/* Tab styles */
+.tab-container {
+  margin-top: 20px;
+}
+
+.tab-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-bottom: 20px;
+}
+
+.tab-button {
+  flex: 1;
+  min-width: 120px;
+  padding: 10px;
+  border: 2px solid #000;
+  border-radius: 5px;
+  background: var(--ugly-yellow);
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.tab-button:hover {
+  background: var(--ugly-blue);
+}
+
+.tab-button.active {
+  background: var(--ugly-pink);
+  transform: translateY(2px);
+}
+
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+} 

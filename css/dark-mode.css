@@ -1,0 +1,88 @@
+:root {
+  --dark-text: #ffffff;
+  --dark-secondary-text: #cccccc;
+  --dark-bg: #1a1a1a;
+  --dark-section: #2d2d2d;
+  --dark-border: #555;
+  --dark-input: #333;
+  --dark-button: #444;
+  --dark-button-hover: #555;
+}
+
+body.dark-mode {
+  background-color: var(--dark-bg) !important;
+  color: var(--dark-text) !important;
+}
+
+.dark-mode section {
+  background: var(--dark-section) !important;
+  border-color: var(--dark-border) !important;
+}
+
+.dark-mode h1 {
+  background: var(--dark-section) !important;
+  border-color: var(--dark-border) !important;
+  color: #ff69b4 !important;
+  text-shadow: 2px 2px 0 #000 !important;
+}
+
+.dark-mode h2 {
+  color: #ff69b4 !important;
+  border-bottom-color: var(--dark-border) !important;
+}
+
+.dark-mode input,
+.dark-mode textarea {
+  background: var(--dark-input) !important;
+  color: var(--dark-text) !important;
+  border-color: var(--dark-border) !important;
+}
+
+.dark-mode button {
+  background: var(--dark-button) !important;
+  color: var(--dark-text) !important;
+  border-color: var(--dark-border) !important;
+  box-shadow: 3px 3px 0 var(--dark-border) !important;
+}
+
+.dark-mode button:hover {
+  background: var(--dark-button-hover) !important;
+}
+
+/* Stili dark mode per la radio */
+.dark-mode #radio-controls {
+  background: var(--dark-section) !important;
+  border-color: var(--dark-border) !important;
+}
+
+.dark-mode #radio-controls button {
+  background: var(--dark-button) !important;
+  color: var(--dark-text) !important;
+  border-color: var(--dark-border) !important;
+}
+
+.dark-mode #radio-controls button:hover {
+  background: var(--dark-button-hover) !important;
+}
+
+.dark-mode #now-playing {
+  background: var(--dark-section) !important;
+  color: var(--dark-text) !important;
+  border: 1px solid var(--dark-border) !important;
+}
+
+.dark-mode .progress-bar {
+  background: var(--dark-input) !important;
+  border-color: var(--dark-border) !important;
+}
+
+.dark-mode .progress {
+  background: var(--ugly-purple) !important;
+}
+
+.dark-mode #volumeControl {
+  background: var(--dark-input) !important;
+  border-color: var(--dark-border) !important;
+}
+
+/* ... resto degli stili dark mode ... */ 

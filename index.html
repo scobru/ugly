@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8" />
+    <title>HUGLY</title>
+    <!-- Import Gun e SEA -->
+    <script src="https://cdn.jsdelivr.net/npm/gun/gun.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gun/sea.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gun/lib/radix.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gun/lib/radisk.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gun/lib/store.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gun/lib/rindexed.js"></script>
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-storage.js"></script>
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/dark-mode.css">
+    <link rel="stylesheet" href="css/animations.css">
+  </head>
+  <body>
+    <h1>HUGLY</h1>
+
+    <!-- SEZIONE ACCOUNT -->
+    <section>
+      <h2>Account</h2>
+      <input id="username" placeholder="Username" />
+      <input id="password" placeholder="Password" type="password" />
+      <button id="signupBtn">Crea Account</button>
+      <button id="loginBtn">Login</button>
+      <p id="userStatus">Non autenticato</p>
+    </section>
+
+    <!-- APP CONTAINER -->
+    <div id="app" class="hidden">
+      <!-- Tab Container -->
+      <div class="tab-container">
+        <!-- Tab Buttons -->
+        <div class="tab-buttons">
+          <button class="tab-button" data-tab="notes">📝 Note & Testo</button>
+          <button class="tab-button" data-tab="calendar">📅 Calendario</button>
+          <button class="tab-button" data-tab="todo">✅ Todo</button>
+          <button class="tab-button" data-tab="voice">🎤 Voce</button>
+          <button class="tab-button" data-tab="passwords">🔐 Password</button>
+          <button class="tab-button" data-tab="reminders">⏰ Promemoria</button>
+          <button class="tab-button" data-tab="contacts">👥 Contatti</button>
+          <button class="tab-button" data-tab="files">📁 File</button>
+          <button class="tab-button" data-tab="chat">💬 Chat</button>
+          <button class="tab-button" data-tab="mail">📧 Mail</button>
+          <button class="tab-button" data-tab="radio">📻 Radio</button>
+          <button class="tab-button" data-tab="uglyfy">🎵 UGLYFY</button>
+        </div>
+
+        <!-- Tab Contents -->
+        <div id="notes-tab" class="tab-content">
+          <section>
+            <h2>Ugly Text</h2>
+            <textarea id="uglyTextArea" rows="3" placeholder="Scrivi qualcosa di 'brutto'..."></textarea>
+          </section>
+          <section>
+            <h2>Ugly Notes</h2>
+            <input type="text" id="uglyNotesInput" placeholder="Inserisci una nota veloce..." />
+            <button id="uglyNotesButton">Aggiungi Nota</button>
+            <ul id="uglyNotesList"></ul>
+          </section>
+        </div>
+        <div id="calendar-tab" class="tab-content"></div>
+        <div id="todo-tab" class="tab-content"></div>
+        <div id="voice-tab" class="tab-content"></div>
+        <div id="passwords-tab" class="tab-content"></div>
+        <div id="reminders-tab" class="tab-content"></div>
+        <div id="contacts-tab" class="tab-content"></div>
+        <div id="files-tab" class="tab-content"></div>
+        <div id="chat-tab" class="tab-content"></div>
+        <div id="mail-tab" class="tab-content"></div>
+        <div id="radio-tab" class="tab-content">
+          <section>
+            <h2>UGLY Radio</h2>
+            <p>Radio live 24/7</p>
+            <div id="radio-container"></div>
+          </section>
+        </div>
+        <div id="uglyfy-tab" class="tab-content">
+          <section>
+            <h2>UGLYFY</h2>
+            <p>Condividi e ascolta musica brutta con la community!</p>
+            <div id="uglyfy-container"></div>
+          </section>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dark Mode Toggle -->
+    <button id="darkModeToggle">🌙</button>
+
+    <!-- Scripts -->
+    <script src="js/config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/sound.js"></script>
+    <script src="js/utils.js"></script>
+    
+    <!-- Modules -->
+    <script src="js/modules/text.js"></script>
+    <script src="js/modules/notes.js"></script>
+    <script src="js/modules/calendar.js"></script>
+    <script src="js/modules/todo.js"></script>
+    <script src="js/modules/voice.js"></script>
+    <script src="js/modules/passwords.js"></script>
+    <script src="js/modules/reminders.js"></script>
+    <script src="js/modules/contacts.js"></script>
+    <script src="js/modules/files.js"></script>
+    <script src="js/modules/chat.js"></script>
+    <script src="js/modules/mail.js"></script>
+    <script src="js/modules/radio.js"></script>
+    <script src="js/modules/uglyfy.js"></script>
+  </body>
+</html> 
