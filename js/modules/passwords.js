@@ -76,14 +76,27 @@ async function addPassword() {
   });
 }
 
+// Funzione per ottenere le password
+function getPasswords() {
+  try {
+    const pwdString = localStorage.getItem('passwords');
+    return pwdString ? JSON.parse(pwdString) : [];
+  } catch (error) {
+    console.error('Errore lettura passwords:', error);
+    return [];
+  }
+}
+
 // Funzione per eliminare una password
 function deletePassword(id) {
-  if (confirm('Vuoi davvero eliminare questa password?')) {
+  try {
     const pwdNode = `${user.is.pub}/passwords`;
     gun.get(pwdNode).get(id).put(null);
     document.getElementById(getSafeId(id))?.remove();
-    encryptedValues.delete(id); // Rimuovi il valore crittato dalla memoria
+    encryptedValues.delete(id);
     addAmbientSound({ type: 'delete' });
+  } catch (error) {
+    console.error('Errore eliminazione password:', error);
   }
 }
 
@@ -143,11 +156,24 @@ function addPasswordToUI(password, id) {
   passwordsList.appendChild(passwordDiv);
 }
 
+// Funzione per renderizzare tutte le password
+function renderPasswords() {
+  const passwordsList = document.getElementById("passwordsList");
+  if (!passwordsList) return;
+  
+  passwordsList.innerHTML = '';
+  const passwords = getPasswords();
+  passwords.forEach(pwd => {
+    addPasswordToUI(pwd, pwd.id);
+  });
+}
+
 // Rendi le funzioni disponibili globalmente
 window.addPassword = addPassword;
 window.deletePassword = deletePassword;
 window.togglePasswordVisibility = togglePasswordVisibility;
 window.loadUglyPasswords = loadUglyPasswords;
+window.renderPasswords = renderPasswords;
 
 // Inizializza il modulo
 loadUglyPasswords(); 

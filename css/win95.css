@@ -1,0 +1,249 @@
+:root {
+  --win95-gray: #c0c0c0;
+  --win95-dark: #808080;
+  --win95-darker: #404040;
+  --win95-light: #ffffff;
+  --win95-blue: #000080;
+  --win95-text: #000000;
+}
+
+body {
+  font-family: "MS Sans Serif", "Segoe UI", Tahoma, sans-serif;
+  background-color: var(--win95-gray);
+  color: var(--win95-text);
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  overflow: hidden;
+  font-size: 12px;
+}
+
+/* Stile Finestra Win95 */
+#app {
+  background: var(--win95-gray);
+  border: 1px solid;
+  border-color: var(--win95-light) var(--win95-darker) var(--win95-darker) var(--win95-light);
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.window-title {
+  background: var(--win95-blue);
+  color: white;
+  padding: 1px 2px;
+  height: 16px;
+  font-weight: bold;
+  font-size: 11px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.window-title .controls {
+  display: flex;
+}
+
+.window-title .control-button {
+  width: 14px;
+  height: 12px;
+  font-size: 8px;
+  padding: 0;
+  margin: 0;
+  border: 1px solid;
+  border-color: var(--win95-light) var(--win95-darker) var(--win95-darker) var(--win95-light);
+  background: var(--win95-gray);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tab-container {
+  display: flex;
+  flex: 1;
+  background: var(--win95-gray);
+  overflow: hidden;
+}
+
+/* Tab Buttons (Vertical) */
+.tab-buttons {
+  display: flex;
+  flex-direction: column;
+  width: 80px;
+  min-width: 80px;
+  border-right: 1px solid var(--win95-darker);
+  background: var(--win95-gray);
+  padding: 1px;
+}
+
+.tab-button {
+  background: var(--win95-gray);
+  border: 1px solid;
+  border-color: var(--win95-light) var(--win95-darker) var(--win95-darker) var(--win95-light);
+  padding: 1px 2px;
+  margin: 0;
+  font-size: 11px;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  white-space: nowrap;
+  height: 18px;
+}
+
+.tab-button.active {
+  border-color: var(--win95-darker) var(--win95-light) var(--win95-light) var(--win95-darker);
+  background: var(--win95-dark);
+  color: var(--win95-light);
+}
+
+/* Tab Content */
+.tab-content {
+  display: none;
+  flex: 1;
+  padding: 2px;
+  overflow-y: auto;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+section {
+  background: var(--win95-gray);
+  border: 1px solid;
+  border-color: var(--win95-darker) var(--win95-light) var(--win95-light) var(--win95-darker);
+  padding: 2px;
+  margin: 1px 0;
+}
+
+input, textarea {
+  width: calc(100% - 4px);
+  border: 1px solid;
+  border-color: var(--win95-darker) var(--win95-light) var(--win95-light) var(--win95-darker);
+  background: white;
+  padding: 1px 2px;
+  margin: 1px 0;
+  font-size: 11px;
+  height: 16px;
+}
+
+button {
+  background: var(--win95-gray);
+  border: 1px solid;
+  border-color: var(--win95-light) var(--win95-darker) var(--win95-darker) var(--win95-light);
+  padding: 1px 4px;
+  margin: 1px;
+  font-size: 11px;
+  color: var(--win95-text);
+  height: 18px;
+  min-width: 50px;
+}
+
+button:active {
+  border-color: var(--win95-darker) var(--win95-light) var(--win95-light) var(--win95-darker);
+}
+
+/* Lista elementi */
+ul li, #uglyToDoList div, #pwdList div, #reminderList div {
+  background: var(--win95-gray);
+  border: 1px solid;
+  border-color: var(--win95-darker) var(--win95-light) var(--win95-light) var(--win95-darker);
+  margin: 1px 0;
+  padding: 1px 2px;
+  font-size: 11px;
+}
+
+h2 {
+  font-size: 11px;
+  margin: 1px 0;
+  font-weight: bold;
+}
+
+/* Mobile Styles */
+@media screen and (max-width: 768px) {
+  .window-title {
+    height: 14px;
+    font-size: 10px;
+    padding: 1px;
+  }
+
+  .window-title .controls {
+    height: 12px;
+  }
+
+  .window-title .control-button {
+    width: 12px;
+    height: 10px;
+    font-size: 7px;
+  }
+
+  .menu-toggle {
+    display: flex;
+    position: fixed;
+    top: 1px;
+    left: 1px;
+    width: 12px;
+    height: 12px;
+    padding: 1px;
+    z-index: 1001;
+  }
+
+  .menu-toggle span {
+    width: 8px;
+    height: 1px;
+  }
+
+  .tab-buttons {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 90px;
+    z-index: 1000;
+    padding: 15px 1px 1px 1px;
+  }
+
+  .tab-content {
+    margin-top: 14px;
+  }
+}
+
+/* iPhone SE e dispositivi molto piccoli */
+@media screen and (max-width: 320px) {
+  .window-title {
+    height: 12px;
+    font-size: 9px;
+  }
+
+  .window-title .control-button {
+    width: 10px;
+    height: 9px;
+    font-size: 6px;
+  }
+
+  .menu-toggle {
+    width: 10px;
+    height: 10px;
+  }
+
+  .menu-toggle span {
+    width: 6px;
+  }
+
+  .tab-buttons {
+    width: 70px;
+    padding-top: 13px;
+  }
+
+  .tab-button {
+    font-size: 9px;
+    height: 14px;
+    padding: 1px;
+  }
+
+  .tab-content {
+    margin-top: 12px;
+  }
+} 

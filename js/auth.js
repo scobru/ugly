@@ -48,15 +48,21 @@ function updateUIForLoggedUser(username) {
   // Nascondi la sezione account
   accountSection.style.display = "none";
   
-  // Mostra il container del logout
-  logoutContainer.style.display = "flex";
-  
-  // Aggiorna lo status e mostra l'app
-  userStatus.textContent = "Loggato come: " + username;
+  // Mostra l'app e aggiorna lo status
   appDiv.classList.remove("hidden");
+
+  // se username è una chiave di Gun, accorcia la chaiave
+  if (username.includes(".")) {
+    username = username.substring(0, 6) + "...";
+  }
+  userStatus.textContent = `👋 Ciao, ${username}!`;
   
-  // Mostra il pulsante logout
-  logoutBtn.style.display = "inline-block";
+  // Mostra il container logout
+  logoutContainer.style.display = "flex";
+  logoutBtn.style.display = "block";
+  
+  // Carica i dati dell'utente
+  loadAllData();
 }
 
 function updateUIForLoggedOut() {
@@ -106,6 +112,18 @@ loginBtn.addEventListener("click", async function () {
   if (!uname || !upass) {
     alert("Inserisci username e password.");
     return;
+  }
+
+  // Riproduci il suono di vittoria immediatamente al click
+  if (window.uglySounds) {
+    if (!window.uglySounds.isInitialized) {
+      window.uglySounds.init();
+    }
+    window.uglySounds.masterGain.gain.value = 0.8; // Aumenta il volume
+    window.uglySounds.playLoginVictory();
+    setTimeout(() => {
+      window.uglySounds.addSound({ type: 'success' });
+    }, 1000);
   }
 
   try {
@@ -263,3 +281,42 @@ gun.on("auth", (ack) => {
 
 // Rendi il logout disponibile globalmente
 window.logout = logout;
+
+function updateUserStatus(user) {
+  const userStatus = document.getElementById('userStatus');
+  if (user) {
+    // Prendi solo i primi 6 caratteri dell'ID utente
+    const shortUserId = user.id.substring(0, 6) + '...';
+    userStatus.innerHTML = `👤 ${shortUserId}`;
+  } else {
+    userStatus.innerHTML = 'Non autenticato';
+  }
+}
+function login(username, pass) {
+  user.auth(username, pass, async (ack) => {
+    if(ack.err) {
+      alert(ack.err);
+      return;
+    }
+    
+    // Forza l'inizializzazione del contesto audio con interazione utente
+    await new Promise(resolve => {
+      const initAudio = () => {
+        if (!window.uglySounds.isInitialized) {
+          window.uglySounds.init();
+        }
+        document.removeEventListener('click', initAudio);
+        resolve();
+      };
+      document.addEventListener('click', initAudio);
+      // Simula un click se l'utente ha già interagito con la pagina
+      if (document.documentElement.hasAttribute('data-user-interacted')) {
+        initAudio();
+      }
+    });
+    
+    // Login riuscito
+    updateUserStatus();
+  });
+}
+

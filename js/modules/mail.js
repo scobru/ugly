@@ -513,3 +513,59 @@ async function clearMailbox() {
     alert('Errore durante lo svuotamento della casella');
   }
 }
+
+// Funzione per ottenere le mail
+function getMails() {
+  try {
+    const mailsString = localStorage.getItem('mails');
+    return mailsString ? JSON.parse(mailsString) : [];
+  } catch (error) {
+    console.error('Errore lettura mail:', error);
+    return [];
+  }
+}
+
+// Funzione per eliminare tutte le mail
+function deleteAllMails() {
+  try {
+    const mailsNode = `${user.is.pub}/mails`;
+    gun.get(mailsNode).map().once((mail, id) => {
+      gun.get(mailsNode).get(id).put(null);
+    });
+    document.getElementById('mailsList').innerHTML = '';
+    addAmbientSound({ type: 'delete' });
+  } catch (error) {
+    console.error('Errore eliminazione mail:', error);
+  }
+}
+
+// Funzione per eliminare una mail
+function deleteMail(id) {
+  try {
+    const mailsNode = `${user.is.pub}/mails`;
+    gun.get(mailsNode).get(id).put(null);
+    document.getElementById(`mail-${id}`)?.remove();
+    addAmbientSound({ type: 'delete' });
+  } catch (error) {
+    console.error('Errore eliminazione mail:', error);
+  }
+}
+
+// Funzione per renderizzare tutte le mail
+function renderMails() {
+  const mailsList = document.getElementById("mailsList");
+  if (!mailsList) return;
+  
+  mailsList.innerHTML = '';
+  const mails = getMails();
+  mails.forEach(mail => {
+    addMailToBox(mail);
+  });
+}
+
+// Rendi le funzioni disponibili globalmente
+window.sendMail = sendMail;
+window.deleteMail = deleteMail;
+window.deleteAllMails = deleteAllMails;
+window.loadUglyMail = loadUglyMail;
+window.renderMails = renderMails;

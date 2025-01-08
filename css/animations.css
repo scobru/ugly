@@ -23,39 +23,327 @@
   100% { transform: scale(1); opacity: 1; }
 }
 
-@keyframes explode {
-  0% {
-    transform: translate(0, 0) scale(1);
+@keyframes clickEffect {
+  0% { transform: scale(1); }
+  50% { transform: scale(0.95); }
+  100% { transform: scale(1); }
+}
+
+@keyframes glowPulse {
+  0% { box-shadow: 0 0 5px rgba(255, 105, 180, 0.5); }
+  50% { box-shadow: 0 0 20px rgba(255, 105, 180, 0.8); }
+  100% { box-shadow: 0 0 5px rgba(255, 105, 180, 0.5); }
+}
+
+@keyframes rotateIn {
+  0% { transform: rotate(-180deg) scale(0); opacity: 0; }
+  100% { transform: rotate(0) scale(1); opacity: 1; }
+}
+
+/* Animazioni per elementi interattivi */
+button:active {
+  animation: clickEffect 0.2s ease-out;
+}
+
+.tab-button:active {
+  animation: clickEffect 0.2s ease-out;
+}
+
+input:focus,
+textarea:focus {
+  animation: glowPulse 1.5s infinite;
+}
+
+/* Animazioni per elementi di stato */
+.todo-completed {
+  animation: rainbow 3s infinite;
+}
+
+.new-message {
+  animation: bounce 0.5s ease-out;
+}
+
+.notification {
+  animation: shake 0.5s ease-in-out;
+}
+
+/* Animazioni per elementi che appaiono */
+.tab-content.active {
+  animation: popIn 0.3s ease-out;
+}
+
+.modal-open {
+  animation: rotateIn 0.5s ease-out;
+}
+
+/* Hover effects */
+button:hover,
+.tab-button:hover {
+  transform: translateY(-2px);
+  transition: transform 0.2s ease;
+}
+
+/* Click effects per vari elementi */
+.radio-card:active,
+.station-card:active,
+.todo-item:active,
+.note-item:active {
+  animation: clickEffect 0.2s ease-out;
+}
+
+/* Effetti per il drag and drop */
+.drop-zone.drag-over {
+  animation: glowPulse 1.5s infinite;
+}
+
+/* Animazione per il titolo principale */
+h1 {
+  animation: rainbow 5s infinite;
+  transition: transform 0.3s ease;
+}
+
+h1:hover {
+  transform: scale(1.1);
+}
+
+/* Animazioni per le sezioni */
+section {
+  animation: popIn 0.5s ease-out;
+  transition: all 0.3s ease;
+}
+
+section:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+/* Animazioni per i checkbox */
+input[type="checkbox"] {
+  transition: all 0.3s ease;
+}
+
+input[type="checkbox"]:checked {
+  animation: bounce 0.5s ease;
+}
+
+/* Animazioni per i bottoni delete */
+button[onclick*="delete"] {
+  transition: all 0.3s ease;
+}
+
+button[onclick*="delete"]:hover {
+  animation: shake 0.5s ease;
+  background-color: var(--ugly-pink) !important;
+}
+
+/* Animazioni per le card */
+.radio-card,
+.station-card,
+#todoList > div,
+#remindersList > div,
+#passwordsList > div,
+#mailsList > div,
+#chatMessages > div {
+  animation: popIn 0.5s ease-out;
+  transition: all 0.3s ease;
+}
+
+/* Animazione per elementi completati */
+.completed,
+[style*="text-decoration: line-through"] {
+  animation: rainbow 3s infinite;
+  transition: opacity 0.3s ease;
+}
+
+/* Animazioni per input e textarea */
+input[type="text"],
+input[type="password"],
+input[type="email"],
+input[type="datetime-local"],
+textarea {
+  transition: all 0.3s ease;
+}
+
+input[type="text"]:focus,
+input[type="password"]:focus,
+input[type="email"]:focus,
+input[type="datetime-local"]:focus,
+textarea:focus {
+  animation: glowPulse 1.5s infinite;
+  transform: scale(1.02);
+}
+
+/* Animazione per il player audio */
+.player-controls {
+  animation: popIn 0.5s ease-out;
+}
+
+.player-controls button {
+  transition: all 0.3s ease;
+}
+
+.player-controls button:hover {
+  animation: bounce 0.5s ease;
+}
+
+/* Animazione per la progress bar */
+.progress {
+  transition: width 0.3s ease;
+}
+
+/* Animazioni per il drag and drop */
+.drop-zone {
+  transition: all 0.3s ease;
+}
+
+.drop-zone.drag-over {
+  animation: glowPulse 1.5s infinite;
+  transform: scale(1.05);
+}
+
+/* Animazione per nuovi messaggi chat */
+.chat-message {
+  animation: popIn 0.5s ease-out;
+}
+
+/* Animazione per il cambio tema */
+body {
+  transition: background-color 0.5s ease;
+}
+
+.dark-mode {
+  transition: all 0.5s ease;
+}
+
+/* Animazione per notifiche */
+.notification,
+.error-message,
+.success-message {
+  animation: shake 0.5s ease-in-out, popIn 0.5s ease-out;
+}
+
+/* Animazione per il menu */
+.tab-buttons {
+  transition: all 0.3s ease;
+}
+
+.tab-button {
+  transition: all 0.3s ease;
+}
+
+.tab-button:hover {
+  animation: bounce 0.5s ease;
+}
+
+.tab-button.active {
+  animation: glowPulse 1.5s infinite;
+}
+
+/* Animazione per il volume slider */
+.volume-slider {
+  transition: all 0.3s ease;
+}
+
+.volume-slider:hover {
+  transform: scale(1.1);
+}
+
+/* Animazione per elementi in hover */
+.song-item:hover,
+.radio-card:hover,
+.station-card:hover {
+  animation: glowPulse 1.5s infinite;
+  transform: translateY(-2px);
+}
+
+/* Animazione per il caricamento */
+@keyframes loading {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading {
+  animation: loading 1s linear infinite;
+}
+
+/* Animazione per elementi eliminati */
+.deleting {
+  animation: fadeOut 0.5s ease-out forwards;
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; transform: scale(1); }
+  to { opacity: 0; transform: scale(0.8); }
+}
+
+/* Animazione per elementi aggiunti */
+.adding {
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.8); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* Animazione per il pulsante di registrazione */
+.recording {
+  animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.7); }
+  70% { transform: scale(1.1); box-shadow: 0 0 0 10px rgba(255, 0, 0, 0); }
+  100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 0, 0, 0); }
+}
+
+/* Animazione per emoji sul click */
+@keyframes particleAnimation {
+  0% { 
+    transform: translate(-50%, -50%) scale(1);
     opacity: 1;
   }
-  100% {
-    transform: translate(var(--dx), var(--dy)) scale(0.2);
+  100% { 
+    transform: translate(-50%, -100px) scale(0);
     opacity: 0;
   }
 }
 
-h1:hover {
-  animation: rainbow 3s infinite;
-}
-
-button:active {
-  animation: shake 0.2s ease-in-out;
-}
-
-.emoji-particle {
+.click-particle {
   position: fixed;
   pointer-events: none;
+  animation: particleAnimation 0.5s ease-out forwards;
+  font-size: 24px;
   z-index: 9999;
-  animation: explode 1s ease-out forwards;
-  transform-origin: center;
 }
 
-.emoji-particle::after {
-  content: "";
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  background: rgba(255, 255, 255, 0.5);
-  filter: blur(4px);
-  z-index: -1;
+/* Lista di emoji per i click particles */
+.click-particle::after {
+  content: attr(data-emoji);
+}
+
+/* Animazioni per i fuochi d'artificio */
+@keyframes firework {
+  0% { 
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 1;
+  }
+  50% {
+    transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(1);
+    opacity: 1;
+  }
+  100% { 
+    transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(0);
+    opacity: 0;
+  }
+}
+
+.firework-particle {
+  position: fixed;
+  pointer-events: none;
+  animation: firework 0.8s ease-out forwards;
+  font-size: 20px;
+  z-index: 9999;
+  --dx: 0px;
+  --dy: 0px;
 } 

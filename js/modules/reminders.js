@@ -77,24 +77,73 @@ async function addReminder() {
 
 // Funzione per completare/decompletare un promemoria
 function toggleReminder(id) {
+  if (!user.is) return;
+  
   const remindersNode = `${user.is.pub}/reminders`;
   gun.get(remindersNode).get(id).once((reminder) => {
     if (reminder) {
-      reminder.done = !reminder.done;
-      gun.get(remindersNode).get(id).put(reminder);
+      const newDone = !reminder.done;
+      
+      // Aggiorna il database
+      gun.get(remindersNode).get(id).put({
+        ...reminder,
+        done: newDone
+      });
+      
+      // Aggiorna l'UI
+      const reminderDiv = document.getElementById(`reminder-${id}`);
+      if (reminderDiv) {
+        reminderDiv.style.backgroundColor = newDone ? 'var(--ugly-green)' : 'var(--card-bg)';
+        const strong = reminderDiv.querySelector('strong');
+        if (strong) {
+          strong.style.textDecoration = newDone ? 'line-through' : 'none';
+        }
+      }
+      
       addAmbientSound({ type: 'click' });
     }
   });
 }
 
+// Funzione per ottenere i promemoria
+function getReminders() {
+  try {
+    const remindersString = localStorage.getItem('reminders');
+    return remindersString ? JSON.parse(remindersString) : [];
+  } catch (error) {
+    console.error('Errore lettura promemoria:', error);
+    return [];
+  }
+}
+
 // Funzione per eliminare un promemoria
 function deleteReminder(id) {
-  if (confirm('Vuoi davvero eliminare questo promemoria?')) {
-    const remindersNode = `${user.is.pub}/reminders`;
-    gun.get(remindersNode).get(id).put(null);
-    document.getElementById(`reminder-${id}`)?.remove();
-    addAmbientSound({ type: 'delete' });
+  try {
+    const reminderDiv = document.getElementById(`reminder-${id}`);
+    if (reminderDiv) {
+      reminderDiv.classList.add('deleting');
+      reminderDiv.addEventListener('animationend', () => {
+        const remindersNode = `${user.is.pub}/reminders`;
+        gun.get(remindersNode).get(id).put(null);
+        reminderDiv.remove();
+        addAmbientSound({ type: 'delete' });
+      });
+    }
+  } catch (error) {
+    console.error('Errore eliminazione promemoria:', error);
   }
+}
+
+// Funzione per renderizzare tutti i promemoria
+function renderReminders() {
+  const remindersList = document.getElementById("remindersList");
+  if (!remindersList) return;
+  
+  remindersList.innerHTML = '';
+  const reminders = getReminders();
+  reminders.forEach(reminder => {
+    addReminderToUI(reminder, reminder.id);
+  });
 }
 
 // Funzione per aggiungere un promemoria alla UI
@@ -103,10 +152,11 @@ function addReminderToUI(reminder, id) {
   
   const reminderDiv = document.createElement('div');
   reminderDiv.id = `reminder-${id}`;
+  reminderDiv.className = 'adding';
   reminderDiv.style.border = '2px solid black';
   reminderDiv.style.padding = '10px';
   reminderDiv.style.margin = '5px 0';
-  reminderDiv.style.backgroundColor = reminder.done ? 'var(--ugly-green)' : 'white';
+  reminderDiv.style.backgroundColor = reminder.done ? 'var(--ugly-green)' : 'var(--card-bg)';
   reminderDiv.style.display = 'flex';
   reminderDiv.style.justifyContent = 'space-between';
   reminderDiv.style.alignItems = 'center';
@@ -132,25 +182,52 @@ function addReminderToUI(reminder, id) {
     minute: '2-digit'
   });
 
-  reminderDiv.innerHTML = `
-    <div style="display: flex; align-items: center; gap: 10px;">
-      <input type="checkbox" ${reminder.done ? 'checked' : ''} 
-             onclick="toggleReminder('${id}')" 
-             style="transform: scale(1.5);">
-      <div>
-        <strong style="${reminder.done ? 'text-decoration: line-through;' : ''}">${reminder.text}</strong>
-        <br>
-        <span style="color: ${isExpired ? 'red' : 'black'}">
-          ${priorityEmoji} ${formattedDate}
-          ${isExpired ? ' (Scaduto)' : ''}
-        </span>
-      </div>
-    </div>
-    <button onclick="deleteReminder('${id}')" 
-            style="background: var(--ugly-pink);">
-      🗑️
-    </button>
+  const checkbox = document.createElement('input');
+  checkbox.type = 'checkbox';
+  checkbox.checked = reminder.done;
+  checkbox.style.transform = 'scale(1.5)';
+  checkbox.style.width = '20px';
+  checkbox.style.height = '20px';
+  checkbox.style.cursor = 'pointer';
+  checkbox.style.accentColor = 'var(--ugly-green)';
+  checkbox.style.border = '2px solid black';
+  checkbox.style.borderRadius = '3px';
+  checkbox.style.marginRight = '5px';
+  checkbox.style.appearance = 'auto';
+
+  const textDiv = document.createElement('div');
+  textDiv.innerHTML = `
+    <strong style="${reminder.done ? 'text-decoration: line-through;' : ''}">${reminder.text}</strong>
+    <br>
+    <span style="color: ${isExpired ? 'red' : 'black'}">
+      ${priorityEmoji} ${formattedDate}
+      ${isExpired ? ' (Scaduto)' : ''}
+    </span>
   `;
+
+  const leftDiv = document.createElement('div');
+  leftDiv.style.display = 'flex';
+  leftDiv.style.alignItems = 'center';
+  leftDiv.style.gap = '10px';
+  leftDiv.appendChild(checkbox);
+  leftDiv.appendChild(textDiv);
+
+  const deleteButton = document.createElement('button');
+  deleteButton.innerHTML = '🗑️';
+  deleteButton.onclick = () => deleteReminder(id);
+  deleteButton.style.background = 'var(--ugly-pink)';
+
+  reminderDiv.appendChild(leftDiv);
+  reminderDiv.appendChild(deleteButton);
+
+  // Aggiungi l'event listener per il checkbox
+  checkbox.addEventListener('change', () => {
+    toggleReminder(id);
+  });
+
+  if (reminder.done) {
+    textDiv.querySelector('strong').classList.add('todo-completed');
+  }
 
   // Ordina i promemoria per data
   let inserted = false;
@@ -172,6 +249,7 @@ window.addReminder = addReminder;
 window.toggleReminder = toggleReminder;
 window.deleteReminder = deleteReminder;
 window.loadUglyReminders = loadUglyReminders;
+window.renderReminders = renderReminders;
 
 // Inizializza il modulo
 loadUglyReminders(); 

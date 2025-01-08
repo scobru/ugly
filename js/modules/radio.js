@@ -6,21 +6,21 @@ class UglyRadio {
     // Usiamo una web radio pubblica che non richiede autenticazione
     this.streams = [
       {
-        name: "Ugly Ambient Radio",
+        name: "Ugly Ambient Radio", 
         description: "Musica ambient 24/7",
         url: "https://ice1.somafm.com/dronezone-128-mp3",
         genre: "Ambient"
       },
       {
         name: "Ugly Space Radio",
-        description: "Suoni spaziali e atmosfere cosmiche",
+        description: "Suoni spaziali e atmosfere cosmiche", 
         url: "https://ice1.somafm.com/deepspaceone-128-mp3",
         genre: "Space"
       },
       {
         name: "Ugly Groove Radio",
         description: "Groove e beats strani",
-        url: "https://ice1.somafm.com/groovesalad-128-mp3",
+        url: "https://ice1.somafm.com/groovesalad-128-mp3", 
         genre: "Electronic"
       }
     ];
@@ -39,6 +39,7 @@ class UglyRadio {
         border-radius: 10px;
         text-align: center;
         color: var(--text-color);
+        transition: background-color 0.3s;
       }
 
       .radio-info {
@@ -47,6 +48,7 @@ class UglyRadio {
         border-radius: 8px;
         margin: 20px 0;
         color: black;
+        transition: background-color 0.3s, color 0.3s;
       }
 
       .radio-controls {
@@ -84,6 +86,7 @@ class UglyRadio {
         text-align: center;
         margin-bottom: 10px;
         font-size: 1.5em;
+        transition: color 0.3s;
       }
 
       .radio-controls button {
@@ -93,6 +96,7 @@ class UglyRadio {
         border-radius: 5px;
         cursor: pointer;
         color: black;
+        transition: background-color 0.3s, color 0.3s;
       }
 
       .radio-controls button:hover {
@@ -101,18 +105,56 @@ class UglyRadio {
 
       .radio-controls input[type="range"] {
         width: 100px;
+        transition: background-color 0.3s;
       }
 
+      /* Dark mode */
       .dark-mode .radio-container {
-        border: 2px solid var(--text-color);
+        background: var(--dark-section);
+        color: var(--dark-text);
       }
 
-      .dark-mode .stream-selector {
-        border-color: var(--text-color);
+      .dark-mode .radio-info {
+        background: var(--dark-section);
+        color: var(--dark-text);
       }
 
       .dark-mode .radio-controls button {
-        border-color: var(--text-color);
+        background: var(--dark-button);
+        color: var(--dark-text);
+        border-color: var(--dark-border);
+      }
+
+      .dark-mode .radio-controls button:hover {
+        background: var(--dark-button-hover);
+      }
+
+      .dark-mode .radio-controls input[type="range"] {
+        background: var(--dark-input);
+      }
+
+      .dark-mode .radio-controls span {
+        color: var(--dark-text);
+      }
+
+      .dark-mode .radio-title {
+        color: var(--dark-text);
+      }
+
+      .dark-mode .stream-selector {
+        background: var(--dark-section);
+        color: var(--dark-text);
+        border-color: var(--dark-border);
+      }
+
+      .dark-mode .stream-selector:hover {
+        background: var(--dark-button-hover);
+      }
+
+      .dark-mode .stream-selector.active {
+        background: var(--dark-accent);
+        color: var(--dark-text);
+        border-color: var(--dark-accent);
       }
     `;
     document.head.appendChild(style);
@@ -185,6 +227,12 @@ class UglyRadio {
           <input type="range" id="radioVolume" min="0" max="1" step="0.1" value="0.5">
           <span>🔊</span>
         </div>
+
+        <div class="volume-controls-container">
+          <span class="volume-control-icon" onclick="decreaseVolume()">🔉</span>
+          <input type="range" id="volumeSlider" min="0" max="100" value="50" class="volume-slider">
+          <span class="volume-control-icon" onclick="increaseVolume()">🔊</span>
+        </div>
       </div>
     `;
 
@@ -224,4 +272,4 @@ class UglyRadio {
 // Inizializzazione
 document.addEventListener('DOMContentLoaded', () => {
   window.uglyRadio = new UglyRadio();
-}); 
+});

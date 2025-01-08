@@ -65,14 +65,39 @@ async function addEvent() {
   });
 }
 
+// Funzione per ottenere gli eventi
+function getEvents() {
+  try {
+    const eventsString = localStorage.getItem('events');
+    return eventsString ? JSON.parse(eventsString) : [];
+  } catch (error) {
+    console.error('Errore lettura eventi:', error);
+    return [];
+  }
+}
+
 // Funzione per eliminare un evento
 function deleteEvent(id) {
-  if (confirm('Vuoi davvero eliminare questo evento?')) {
+  try {
     const eventsNode = `${user.is.pub}/events`;
     gun.get(eventsNode).get(id).put(null);
     document.getElementById(`event-${id}`)?.remove();
     addAmbientSound({ type: 'delete' });
+  } catch (error) {
+    console.error('Errore eliminazione evento:', error);
   }
+}
+
+// Funzione per renderizzare tutti gli eventi
+function renderEvents() {
+  const eventsList = document.getElementById("eventsList");
+  if (!eventsList) return;
+  
+  eventsList.innerHTML = '';
+  const events = getEvents();
+  events.forEach(event => {
+    addEventToUI(event, event.id);
+  });
 }
 
 // Funzione per aggiungere un evento alla UI
@@ -138,6 +163,7 @@ function addEventToUI(event, id) {
 window.addEvent = addEvent;
 window.deleteEvent = deleteEvent;
 window.loadUglyCalendar = loadUglyCalendar;
+window.renderEvents = renderEvents;
 
 // Inizializza il modulo
 loadUglyCalendar(); 

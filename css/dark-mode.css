@@ -1,78 +1,78 @@
 :root {
   --dark-text: #ffffff;
-  --dark-secondary-text: #cccccc;
-  --dark-bg: #1a1a1a;
-  --dark-section: #2d2d2d;
-  --dark-border: #555;
-  --dark-input: #333;
-  --dark-button: #444;
-  --dark-button-hover: #555;
-  --card-bg: white;
-  --text-color: black;
+  --dark-secondary-text: #e0e0e0;
+  --dark-bg: #121212;
+  --dark-section: #1e1e1e;
+  --dark-setion2: #615f5f;
+  --dark-border: #404040;
+  --dark-input: #2d2d2d;
+  --dark-button: #333333;
+  --dark-button-hover: #444444;
+  --dark-header-bg: #1a1a1a;
+  --dark-header-border: #ff69b4;
+  --dark-card: #252525;
+  --dark-player-bg: #1a1a1a;
+  --dark-accent: #ff69b4;
+  --dark-accent-hover: #ff8cc6;
+  --dark-shadow: rgba(0, 0, 0, 0.3);
 }
 
 body.dark-mode {
   background-color: var(--dark-bg) !important;
   color: var(--dark-text) !important;
-  --card-bg: #2a2a2a;
-  --text-color: #ffffff;
+}
+
+/* Header e Menu */
+.dark-mode .header-container {
+  background: var(--dark-header-bg) !important;
+  border-bottom: 3px dashed var(--dark-header-border) !important;
+  box-shadow: 0 2px 10px var(--dark-shadow) !important;
+}
+
+.dark-mode h1,
+.dark-mode h2,
+.dark-mode h3 {
+  color: var(--dark-accent) !important;
+  text-shadow: 2px 2px 4px var(--dark-shadow) !important;
+}
+
+/* Contenuti */
+.dark-mode .app-container {
+  background-color: rgba(0, 0, 0, 0.2) !important;
+  box-shadow: 0 0 20px var(--dark-shadow) !important;
 }
 
 .dark-mode section {
   background: var(--dark-section) !important;
   border-color: var(--dark-border) !important;
+  box-shadow: 3px 3px 0 var(--dark-shadow) !important;
 }
 
-.dark-mode h1 {
-  background: var(--dark-section) !important;
+.dark-mode section:nth-child(odd) {
+  background: var(--dark-section);
+}
+
+.dark-mode section:nth-child(even) {
+  background: var(--dark-section);
+}
+
+
+/* Radio e Player */
+.dark-mode #radio-container{
+  background: var(--dark-player-bg) !important;
+  border: 2px solid var(--dark-border) !important;
+  box-shadow: 0 2px 10px var(--dark-shadow) !important;
+}
+
+.dark-mode #uglyfy-container {
+  background: var(--dark-player-bg) !important;
+  border: 2px solid var(--dark-border) !important;
+  box-shadow: 0 2px 10px var(--dark-shadow) !important;
+}
+
+.dark-mode .player-controls {
+  background: var(--dark-card) !important;
   border-color: var(--dark-border) !important;
-  color: #ff69b4 !important;
-  text-shadow: 2px 2px 0 #000 !important;
-}
-
-.dark-mode h2 {
-  color: #ff69b4 !important;
-  border-bottom-color: var(--dark-border) !important;
-}
-
-.dark-mode input,
-.dark-mode textarea {
-  background: var(--dark-input) !important;
-  color: var(--dark-text) !important;
-  border-color: var(--dark-border) !important;
-}
-
-.dark-mode button {
-  background: var(--dark-button) !important;
-  color: var(--dark-text) !important;
-  border-color: var(--dark-border) !important;
-  box-shadow: 3px 3px 0 var(--dark-border) !important;
-}
-
-.dark-mode button:hover {
-  background: var(--dark-button-hover) !important;
-}
-
-/* Stili dark mode per la radio */
-.dark-mode #radio-controls {
-  background: var(--dark-section) !important;
-  border-color: var(--dark-border) !important;
-}
-
-.dark-mode #radio-controls button {
-  background: var(--dark-button) !important;
-  color: var(--dark-text) !important;
-  border-color: var(--dark-border) !important;
-}
-
-.dark-mode #radio-controls button:hover {
-  background: var(--dark-button-hover) !important;
-}
-
-.dark-mode #now-playing {
-  background: var(--dark-section) !important;
-  color: var(--dark-text) !important;
-  border: 1px solid var(--dark-border) !important;
 }
 
 .dark-mode .progress-bar {
@@ -81,26 +81,582 @@ body.dark-mode {
 }
 
 .dark-mode .progress {
-  background: var(--ugly-purple) !important;
+  background: var(--dark-accent) !important;
 }
 
-.dark-mode #volumeControl {
+/* Input e Form */
+.dark-mode input,
+.dark-mode textarea {
   background: var(--dark-input) !important;
+  color: var(--dark-text) !important;
+  border: 1px solid var(--dark-border) !important;
+  box-shadow: inset 0 1px 3px var(--dark-shadow) !important;
+}
+
+.dark-mode input:focus,
+.dark-mode textarea:focus {
+  border-color: var(--dark-accent) !important;
+  box-shadow: 0 0 5px var(--dark-accent) !important;
+}
+
+.dark-mode input::placeholder,
+.dark-mode textarea::placeholder {
+  color: var(--dark-secondary-text) !important;
+}
+
+/* Liste e Card */
+.dark-mode ul li,
+.dark-mode #uglyToDoList div,
+.dark-mode #pwdList div,
+.dark-mode #reminderList div {
+  background: var(--dark-card) !important;
+  border: 1px solid var(--dark-border) !important;
+  color: var(--dark-text) !important;
+  box-shadow: 2px 2px 4px var(--dark-shadow) !important;
+}
+
+.dark-mode ul li:hover,
+.dark-mode #uglyToDoList div:hover,
+.dark-mode #pwdList div:hover,
+.dark-mode #reminderList div:hover {
+  background: var(--dark-section) !important;
+  border-color: var(--dark-accent) !important;
+}
+
+/* Bottoni */
+.dark-mode button {
+  background: var(--dark-button) !important;
+  color: var(--dark-text) !important;
+  border: 1px solid var(--dark-border) !important;
+  box-shadow: 2px 2px 0 var(--dark-shadow) !important;
+}
+
+.dark-mode button:hover {
+  background: var(--dark-button-hover) !important;
+  border-color: var(--dark-accent) !important;
+  color: var(--dark-accent) !important;
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0 var(--dark-shadow) !important;
+}
+
+.dark-mode button.active {
+  background: var(--dark-accent) !important;
+  color: var(--dark-bg) !important;
+  border-color: var(--dark-accent-hover) !important;
+}
+
+/* Radio e UGLYFY */
+.dark-mode .radio-section,
+.dark-mode .uglyfy-section {
+  background: var(--dark-section) !important;
+  border: 2px solid var(--dark-border) !important;
+  box-shadow: 0 2px 10px var(--dark-shadow) !important;
+}
+
+.dark-mode .radio-card,
+.dark-mode .station-card {
+  background: var(--dark-card) !important;
+  border: 2px solid var(--dark-border) !important;
+  box-shadow: 3px 3px 0 var(--dark-shadow) !important;
+  color: var(--dark-text) !important;
+}
+
+.dark-mode .radio-card:hover,
+.dark-mode .station-card:hover {
+  border-color: var(--dark-accent) !important;
+  transform: translateY(-2px);
+  box-shadow: 3px 5px 0 var(--dark-shadow) !important;
+  background: var(--dark-section) !important;
+}
+
+.dark-mode .radio-title,
+.dark-mode .station-title {
+  color: var(--dark-accent) !important;
+  text-shadow: 2px 2px 4px var(--dark-shadow) !important;
+}
+
+.dark-mode .radio-description,
+.dark-mode .station-description {
+  color: var(--dark-secondary-text) !important;
+}
+
+.dark-mode .player-controls {
+  background: var(--dark-card) !important;
+  border: 2px solid var(--dark-border) !important;
+  padding: 10px !important;
+  margin-top: 10px !important;
+}
+
+.dark-mode .player-controls button {
+  background: var(--dark-button) !important;
+  color: var(--dark-text) !important;
+  border: 1px solid var(--dark-border) !important;
+  padding: 5px 10px !important;
+  margin: 0 5px !important;
+}
+
+.dark-mode .player-controls button:hover {
+  background: var(--dark-button-hover) !important;
+  color: var(--dark-accent) !important;
+  border-color: var(--dark-accent) !important;
+}
+
+.dark-mode .player-controls button:active {
+  transform: scale(0.95);
+}
+
+.dark-mode .progress-container {
+  background: var(--dark-input) !important;
+  border: 1px solid var(--dark-border) !important;
+  padding: 2px !important;
+  margin: 10px 0 !important;
+}
+
+.dark-mode .progress-bar {
+  background: var(--dark-input) !important;
+  border: 1px solid var(--dark-border) !important;
+  height: 20px !important;
+}
+
+.dark-mode .progress {
+  background: var(--dark-accent) !important;
+  height: 100% !important;
+}
+
+.dark-mode .volume-control {
+  background: var(--dark-input) !important;
+  border: 1px solid var(--dark-border) !important;
+  padding: 5px !important;
+  margin-top: 10px !important;
+}
+
+.dark-mode .volume-slider {
+  accent-color: var(--dark-accent) !important;
+}
+
+/* Stili specifici per il drag and drop di UGLYFY */
+.dark-mode .drop-zone {
+  background: var(--dark-card) !important;
+  border: 2px dashed var(--dark-border) !important;
+  color: var(--dark-secondary-text) !important;
+  padding: 20px !important;
+  margin: 10px 0 !important;
+  text-align: center !important;
+}
+
+.dark-mode .drop-zone.drag-over {
+  background: var(--dark-button-hover) !important;
+  border-color: var(--dark-accent) !important;
+  color: var(--dark-accent) !important;
+}
+
+.dark-mode .song-list {
+  background: var(--dark-card) !important;
+  border: 2px solid var(--dark-border) !important;
+  padding: 10px !important;
+  margin-top: 20px !important;
+}
+
+.dark-mode .song-item {
+  background: var(--dark-section) !important;
+  border: 1px solid var(--dark-border) !important;
+  color: var(--dark-text) !important;
+  padding: 10px !important;
+  margin: 5px 0 !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+}
+
+.dark-mode .song-item:hover {
+  background: var(--dark-button-hover) !important;
+  border-color: var(--dark-accent) !important;
+}
+
+.dark-mode .song-title {
+  color: var(--dark-text) !important;
+  font-weight: bold !important;
+}
+
+.dark-mode .song-artist {
+  color: var(--dark-secondary-text) !important;
+  font-size: 0.9em !important;
+}
+
+.dark-mode .now-playing {
+  background: var(--dark-accent) !important;
+  color: var(--dark-bg) !important;
+  padding: 2px 8px !important;
+  border-radius: 3px !important;
+  font-size: 0.8em !important;
+  margin-left: 10px !important;
+}
+
+/* Elementi di stato e feedback */
+.dark-mode .completed {
+  text-decoration: line-through;
+  color: var(--dark-secondary-text) !important;
+}
+
+.dark-mode .error-message {
+  color: #ff6b6b !important;
+  background: rgba(255, 107, 107, 0.1) !important;
+  border: 1px solid #ff6b6b !important;
+}
+
+.dark-mode .success-message {
+  color: #51cf66 !important;
+  background: rgba(81, 207, 102, 0.1) !important;
+  border: 1px solid #51cf66 !important;
+}
+
+/* Stili specifici per i componenti in dark mode */
+.dark-mode #eventsList div,
+.dark-mode #todoList div,
+.dark-mode #passwordsList div,
+.dark-mode #remindersList div,
+.dark-mode #mailsList div,
+.dark-mode #chatMessages div {
+  background-color: var(--dark-card) !important;
+  color: var(--dark-text) !important;
   border-color: var(--dark-border) !important;
 }
 
-/* ... resto degli stili dark mode ... */
-
-/* Stili specifici per le card dei contatti in dark mode */
-body.dark-mode .contact-card {
-  border-color: #444;
-  box-shadow: 2px 2px 0 #444;
+.dark-mode #eventsList div strong,
+.dark-mode #todoList div span,
+.dark-mode #passwordsList div strong,
+.dark-mode #remindersList div strong,
+.dark-mode #mailsList div strong,
+.dark-mode #chatMessages div {
+  color: var(--dark-text) !important;
 }
 
-body.dark-mode .contact-card button {
-  border-color: #444;
+.dark-mode #eventsList div small,
+.dark-mode #todoList div small,
+.dark-mode #passwordsList div small,
+.dark-mode #remindersList div small,
+.dark-mode #mailsList div small {
+  color: var(--dark-secondary-text) !important;
 }
 
-body.dark-mode .contact-card small {
-  color: #aaa;
+/* Stili specifici per checkbox in dark mode */
+.dark-mode input[type="checkbox"] {
+  accent-color: var(--dark-accent) !important;
+  border-color: var(--dark-accent) !important;
+  background-color: var(--dark-input) !important;
+}
+
+/* Stili per elementi completati in dark mode */
+.dark-mode .completed,
+.dark-mode [style*="text-decoration: line-through"] {
+  color: var(--dark-secondary-text) !important;
+  text-decoration-color: var(--dark-accent) !important;
+}
+
+/* Stili per le mail in dark mode */
+.dark-mode #mailsList div[style*="background"] {
+  background-color: var(--dark-card) !important;
+}
+
+.dark-mode #mailsList div span[style*="background"] {
+  background-color: var(--dark-accent) !important;
+  color: var(--dark-bg) !important;
+}
+
+/* Stili per la chat in dark mode */
+.dark-mode #chatMessages div {
+  background-color: var(--dark-card) !important;
+  border-color: var(--dark-border) !important;
+}
+
+/* Stili per il contenuto delle password in dark mode */
+.dark-mode .password-value {
+  color: var(--dark-text) !important;
+}
+
+/* Stili per elementi completati/scaduti */
+.dark-mode .expired,
+.dark-mode [style*="color: red"] {
+  color: #ff6b6b !important;
+}
+
+/* Stili Dark Mode per Radio */
+.dark-mode #radio-tab {
+  background: var(--dark-bg);
+  color: var(--dark-text);
+}
+
+
+
+.dark-mode .radio-card {
+  background: var(--dark-card);
+  border: 2px solid var(--dark-border);
+  color: var(--dark-text);
+  box-shadow: 0 4px 8px var(--dark-shadow);
+}
+
+.dark-mode .radio-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px var(--dark-shadow);
+  border-color: var(--dark-accent);
+  background: var(--dark-section);
+}
+
+.dark-mode .radio-card h3 {
+  color: var(--dark-accent);
+  text-shadow: 0 0 8px rgba(255, 105, 180, 0.4);
+}
+
+.dark-mode .radio-card p {
+  color: var(--dark-secondary-text);
+}
+
+.dark-mode #radio-tab button {
+  background: var(--dark-button);
+  color: var(--dark-text);
+  border: 2px solid var(--dark-border);
+}
+
+.dark-mode #radio-tab button:hover {
+  background: var(--dark-accent);
+  border-color: var(--dark-accent-hover);
+  transform: scale(1.05);
+  color: var(--dark-bg);
+}
+
+.dark-mode #radio-tab button:active {
+  transform: scale(0.95);
+}
+
+.dark-mode .station-card {
+  background: linear-gradient(145deg, var(--dark-card) 0%, var(--dark-bg) 100%);
+  border: 2px solid var(--dark-border);
+  color: var(--dark-text);
+  box-shadow: 0 4px 8px var(--dark-shadow);
+}
+
+.dark-mode .station-card:hover {
+  border-color: var(--dark-accent);
+  box-shadow: 0 6px 12px var(--dark-shadow);
+  background: linear-gradient(145deg, var(--dark-section) 0%, var(--dark-card) 100%);
+}
+
+.dark-mode .station-info {
+  background: rgba(0, 0, 0, 0.2);
+  border-top: 1px solid var(--dark-border);
+  padding: 10px;
+}
+
+.dark-mode .station-controls {
+  background: rgba(0, 0, 0, 0.3);
+  padding: 10px;
+  border-top: 1px solid var(--dark-border);
+}
+
+.dark-mode .volume-slider {
+  background: var(--dark-input);
+  border: 1px solid var(--dark-border);
+}
+
+.dark-mode .volume-slider::-webkit-slider-thumb {
+  background: var(--dark-accent);
+  border: 2px solid var(--dark-accent-hover);
+}
+
+.dark-mode .volume-slider::-moz-range-thumb {
+  background: var(--dark-accent);
+  border: 2px solid var(--dark-accent-hover);
+}
+
+/* Effetti di brillantezza per elementi attivi */
+.dark-mode .radio-card.playing {
+  border-color: var(--dark-accent);
+  box-shadow: 0 0 15px var(--dark-accent);
+  animation: glow 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes glow {
+  from {
+    box-shadow: 0 0 5px rgba(255, 105, 180, 0.2),
+                0 0 10px rgba(255, 105, 180, 0.2),
+                0 0 15px rgba(255, 105, 180, 0.2);
+  }
+  to {
+    box-shadow: 0 0 10px rgba(255, 105, 180, 0.3),
+                0 0 20px rgba(255, 105, 180, 0.3),
+                0 0 30px rgba(255, 105, 180, 0.3);
+  }
+}
+
+/* Stili Dark Mode per Radio Live */
+.dark-mode #radio-tab {
+  background: var(--dark-bg);
+  color: var(--dark-text);
+}
+
+.dark-mode .radio-live-container {
+  background: var(--dark-section);
+  border: 2px solid var(--dark-border);
+  box-shadow: 0 4px 8px var(--dark-shadow);
+  padding: 20px;
+  margin: 10px 0;
+}
+
+
+.dark-mode .ugly-radio-live {
+  background: var(--dark-section);
+  border-bottom: 2px solid var(--dark-accent);
+  color: var(--dark-accent);
+  padding: 15px;
+  text-align: center;
+  font-size: 1.2em;
+  text-shadow: 0 0 8px rgba(255, 105, 180, 0.4);
+}
+
+.dark-mode .radio-station {
+  background: var(--dark-card);
+  border: 2px solid var(--dark-border);
+  color: var(--dark-text);
+  padding: 15px;
+  margin: 10px 0;
+  transition: all 0.3s ease;
+}
+
+.dark-mode .radio-station:hover {
+  transform: translateY(-2px);
+  border-color: var(--dark-accent);
+  box-shadow: 0 6px 12px var(--dark-shadow);
+}
+
+.dark-mode .radio-station.active {
+  background: var(--dark-section);
+  border-color: var(--dark-accent);
+  box-shadow: 0 0 15px var(--dark-accent);
+}
+
+.dark-mode .radio-station-title {
+  color: var(--dark-accent);
+  font-size: 1.1em;
+  margin-bottom: 5px;
+}
+
+.dark-mode .radio-station-info {
+  color: var(--dark-secondary-text);
+  font-size: 0.9em;
+}
+
+.dark-mode .radio-controls {
+  background: var(--dark-section);
+  border-top: 2px solid var(--dark-border);
+  padding: 15px;
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+.dark-mode .radio-controls button {
+  background: var(--dark-button);
+  color: var(--dark-text);
+  border: 2px solid var(--dark-border);
+  padding: 8px 15px;
+  font-size: 1.2em;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.dark-mode .radio-controls button:hover {
+  background: var(--dark-accent);
+  border-color: var(--dark-accent-hover);
+  color: var(--dark-bg);
+  transform: scale(1.05);
+}
+
+.dark-mode .radio-controls button:active {
+  transform: scale(0.95);
+}
+
+/* Stili per le stazioni radio specifiche */
+.dark-mode [data-station="ambient"] {
+  background: linear-gradient(145deg, var(--dark-card) 0%, var(--dark-section) 100%);
+}
+
+.dark-mode [data-station="space"] {
+  background: linear-gradient(145deg, var(--dark-section) 0%, var(--dark-card) 100%);
+}
+
+.dark-mode [data-station="groove"] {
+  background: linear-gradient(145deg, var(--dark-card) 0%, var(--dark-bg) 100%);
+}
+
+/* Effetti di brillantezza per la stazione attiva */
+.dark-mode .radio-station.playing {
+  animation: radioGlow 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes radioGlow {
+  from {
+    box-shadow: 0 0 5px rgba(255, 105, 180, 0.2),
+                0 0 10px rgba(255, 105, 180, 0.2);
+  }
+  to {
+    box-shadow: 0 0 15px rgba(255, 105, 180, 0.3),
+                0 0 30px rgba(255, 105, 180, 0.3);
+  }
+}
+
+.dark-mode #radio-tab .radio-live-container {
+  background: var(--dark-section) !important;
+  border: 2px solid var(--dark-border) !important;
+  color: var(--dark-text) !important;
+}
+
+.dark-mode #radio-tab .radio-live-container h2,
+.dark-mode #radio-tab .radio-live-container p {
+  color: var(--dark-text) !important;
+}
+
+.dark-mode #radio-tab .radio-live-container .genre-info {
+  color: var(--dark-secondary-text) !important;
+}
+
+/* Stili per i controlli del volume */
+.volume-control-icon {
+  font-size: 24px !important;
+  padding: 5px !important;
+  margin: 0 5px !important;
+  color: var(--dark-text) !important;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5) !important;
+  cursor: pointer !important;
+  transition: transform 0.2s ease !important;
+}
+
+.volume-control-icon:hover {
+  transform: scale(1.1) !important;
+  color: var(--dark-accent) !important;
+}
+
+.dark-mode .volume-control-icon {
+  color: var(--dark-text) !important;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5) !important;
+}
+
+.dark-mode .volume-control-icon:hover {
+  color: var(--dark-accent) !important;
+}
+
+/* Stili per il contenitore dei controlli volume */
+.volume-controls-container {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 10px !important;
+  padding: 10px !important;
+  background: rgba(0, 0, 0, 0.1) !important;
+  border-radius: 5px !important;
+  margin: 10px 0 !important;
+}
+
+.dark-mode .volume-controls-container {
+  background: rgba(255, 255, 255, 0.1) !important;
 } 

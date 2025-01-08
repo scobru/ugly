@@ -65,14 +65,39 @@ async function addContact() {
   });
 }
 
+// Funzione per ottenere i contatti
+function getContacts() {
+  try {
+    const contactsString = localStorage.getItem('contacts');
+    return contactsString ? JSON.parse(contactsString) : [];
+  } catch (error) {
+    console.error('Errore lettura contatti:', error);
+    return [];
+  }
+}
+
 // Funzione per eliminare un contatto
 function deleteContact(id) {
-  if (confirm('Vuoi davvero eliminare questo contatto?')) {
+  try {
     const contactsNode = `${user.is.pub}/contacts`;
     gun.get(contactsNode).get(id).put(null);
     document.getElementById(`contact-${id}`)?.remove();
     addAmbientSound({ type: 'delete' });
+  } catch (error) {
+    console.error('Errore eliminazione contatto:', error);
   }
+}
+
+// Funzione per renderizzare tutti i contatti
+function renderContacts() {
+  const contactsList = document.getElementById("contactsList");
+  if (!contactsList) return;
+  
+  contactsList.innerHTML = '';
+  const contacts = getContacts();
+  contacts.forEach(contact => {
+    addContactToUI(contact, contact.id);
+  });
 }
 
 // Funzione per aggiungere un contatto alla UI
@@ -112,6 +137,7 @@ function addContactToUI(contact, id) {
 window.addContact = addContact;
 window.deleteContact = deleteContact;
 window.loadUglyContacts = loadUglyContacts;
+window.renderContacts = renderContacts;
 
 // Inizializza il modulo
 loadUglyContacts(); 

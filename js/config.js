@@ -1,5 +1,5 @@
 // Configurazione Gun
-const gun = Gun({
+window.gun = Gun({
   peers: [
     "https://gun-relay.scobrudot.dev/gun",
     "https://peer.wallie.io/gun",
@@ -10,7 +10,7 @@ const gun = Gun({
   radisk: false,
 });
 
-const user = gun.user();
+window.user = gun.user();
 
 // Debug della connessione
 gun.on("hi", (peer) => {
@@ -36,18 +36,19 @@ window.addEventListener('online', () => {
   gun.opt({peers: [
     "https://gun-relay.scobrudot.dev/gun",
     "https://peer.wallie.io/gun",
-    "https://ruling-mastodon-improved.ngrok-free.app/gun",
     "https://gun-manhattan.herokuapp.com/gun",
+    "https://ruling-mastodon-improved.ngrok-free.app/gun",
+
   ]});
 });
 
 const config = {
   gun: {
     peers: [
-    "https://gun-relay.scobrudot.dev/gun",
-    "https://peer.wallie.io/gun",
-    "https://ruling-mastodon-improved.ngrok-free.app/gun",
-    "https://gun-manhattan.herokuapp.com/gun"
+      "https://gun-relay.scobrudot.dev/gun",
+      "https://peer.wallie.io/gun",
+      "https://gun-manhattan.herokuapp.com/gun",
+      "https://ruling-mastodon-improved.ngrok-free.app/gun"
     ]
   },
   radio: {
