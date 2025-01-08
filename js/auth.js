@@ -182,45 +182,67 @@ function loadAllData() {
   }
 }
 
+// Funzione di logout migliorata
 function logout() {
-  if (isAuthenticating) {
-    console.log("Autenticazione in corso, attendi...");
-    return;
-  }
-
+  console.log('Inizio processo logout...');
+  
   try {
-    isAuthenticating = true;
-    console.log("Inizio processo di logout...");
+    // Disabilita il pulsante durante il logout
+    const logoutBtn = document.querySelector('button[onclick="logout()"]');
+    if (logoutBtn) {
+      logoutBtn.disabled = true;
+      logoutBtn.textContent = '🔄 Logout in corso...';
+    }
 
-    // Pulisci i dati dell'utente
+    // Pulisci le variabili di stato delle mail
+    window.currentUser = null;
+    window.processedMails = new Set();
+    window.mailInitialized = false;
+
+    // Pulisci la UI
+    const mailsList = document.getElementById('mailsList');
+    if (mailsList) {
+      mailsList.innerHTML = '';
+    }
+
+    // Disconnetti l'utente da Gun
     if (user.is) {
       user.leave();
-      console.log("Utente disconnesso da Gun");
+      console.log('Utente disconnesso da Gun');
     }
 
     // Pulisci storage
     localStorage.clear();
     sessionStorage.clear();
-    console.log("Storage pulito");
+    console.log('Storage pulito');
 
     // Aggiorna UI
-    updateUIForLoggedOut();
-    console.log("UI aggiornata");
+    const userStatus = document.getElementById('userStatus');
+    const appDiv = document.getElementById('app');
+    const accountSection = document.querySelector('section:first-of-type');
+    
+    if (userStatus) userStatus.textContent = 'Non autenticato';
+    if (appDiv) appDiv.classList.add('hidden');
+    if (accountSection) accountSection.style.display = 'block';
+
+    // Pulisci i campi di input
+    const usernameField = document.getElementById('username');
+    const passwordField = document.getElementById('password');
+    if (usernameField) usernameField.value = '';
+    if (passwordField) passwordField.value = '';
 
     // Effetto sonoro
-    addAmbientSound({ type: "delete" });
+    addAmbientSound({ type: 'delete' });
 
     // Ricarica la pagina dopo un breve delay
     setTimeout(() => {
-      console.log("Ricarico la pagina...");
-      window.location.href = window.location.pathname;
-    }, 500);
+      console.log('Ricarico la pagina...');
+      window.location.reload();
+    }, 1000);
 
   } catch (error) {
-    console.error("Errore durante il logout:", error);
-    alert("Errore durante il logout: " + error.message);
-  } finally {
-    isAuthenticating = false;
+    console.error('Errore durante il logout:', error);
+    alert('Errore durante il logout: ' + error.message);
   }
 }
 
@@ -232,3 +254,6 @@ gun.on("auth", (ack) => {
     logoutBtn.style.display = "none";
   }
 });
+
+// Rendi il logout disponibile globalmente
+window.logout = logout;

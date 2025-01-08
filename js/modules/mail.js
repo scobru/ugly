@@ -167,16 +167,14 @@ async function sendMail() {
       timestamp: timestamp
     };
 
-    // 3. Cripta usando la chiave ephemeral (ECDH)
-    console.log('ECDH + AES: secret con:', {
-      'destinatario_epub': to_epub,
-      'mie_chiavi': user._.sea
-    });
+    // Stringifica l'oggetto prima della crittografia
+    const mailString = JSON.stringify(mailData);
+    console.log('Stringa da crittare:', mailString);
 
     const secret = await SEA.secret(to_epub, user._.sea);
     console.log('Secret generato:', !!secret);
 
-    const encryptedContent = await SEA.encrypt(JSON.stringify(mailData), secret);
+    const encryptedContent = await SEA.encrypt(mailString, secret); // Cripta la stringa
     console.log('Contenuto crittato:', !!encryptedContent);
 
     // 4. Salva nella mailbox pubblica: "mails"
@@ -337,23 +335,41 @@ async function loadUglyMail() {
         console.log('Secret generato:', !!secret);
         
         const decryptedData = await SEA.decrypt(mail.data, secret);
-        console.log('Risultato decrittazione:', !!decryptedData);
+        console.log('Dati decrittati:', decryptedData);
         
-        if (!decryptedData) {
-          console.error('Mail non decrittabile:', id);
+        let mailData;
+        
+        // Gestisci sia stringhe JSON che oggetti già parsati
+        if (typeof decryptedData === 'string') {
+          try {
+            mailData = JSON.parse(decryptedData);
+          } catch (parseError) {
+            console.error('Errore parsing JSON:', parseError);
+            return;
+          }
+        } else if (typeof decryptedData === 'object' && decryptedData !== null) {
+          mailData = decryptedData;
+        } else {
+          console.error('Formato dati non valido:', decryptedData);
           return;
         }
 
-        let mailData = JSON.parse(decryptedData);
-        console.log('Mail decrittata con successo:', mailData);
+        console.log('Mail processata:', mailData);
         
+        // Verifica che i campi necessari siano presenti
+        if (!mailData.subject || !mailData.content || !mailData.from || !mailData.to) {
+          console.error('Mail mancante di campi obbligatori:', mailData);
+          return;
+        }
+
         mailData.id = id;
         mailData.type = 'received';
         
+        console.log('Aggiungo mail alla UI:', mailData);
         addMailToBox(mailData);
 
       } catch (e) {
-        console.error('Errore processamento mail ricevuta:', id, e);
+        console.error('Errore processamento mail:', id, e);
       }
     });
 
